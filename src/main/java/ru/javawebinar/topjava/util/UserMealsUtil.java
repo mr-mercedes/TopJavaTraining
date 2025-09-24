@@ -10,6 +10,7 @@ import java.time.Month;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class UserMealsUtil {
     public static void main(String[] args) {
@@ -33,6 +34,10 @@ public class UserMealsUtil {
         System.out.println("Filtered by Cycles");
         List<UserMealWithExcess> mealsToSimpleCycles = filteredByCycles(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
         mealsToSimpleCycles.forEach(System.out::println);
+        System.out.println("\n");
+        System.out.println("Filtered by Simple Streams");
+        List<UserMealWithExcess> mealsToStreamsSimple = filteredByStreamsSimple(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
+        mealsToStreamsSimple.forEach(System.out::println);
         System.out.println("\n");
         System.out.println("Filtered by Streams");
         List<UserMealWithExcess> mealsToStreams = filteredByStreams(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
@@ -117,6 +122,23 @@ public class UserMealsUtil {
                     return res;
                 })
         ));
+    }
+
+    public static List<UserMealWithExcess> filteredByStreamsSimple(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
+        Map<LocalDate, Integer> caloriesPerDayMap = meals.stream()
+                .collect(Collectors.groupingBy(
+                        meal -> meal.getDateTime().toLocalDate(),
+                        Collectors.summingInt(UserMeal::getCalories)
+                ));
+
+        return meals.stream()
+                .filter(meal -> TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime))
+                .map(meal -> {
+                    int totalCalories = caloriesPerDayMap.get(meal.getDateTime().toLocalDate());
+                    boolean excess = totalCalories > caloriesPerDay;
+                    return new UserMealWithExcess(meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
+                })
+                .collect(Collectors.toList());
     }
 
     public static UserMealWithExcess toDTO(UserMeal meal, AtomicBoolean excessRef) {
