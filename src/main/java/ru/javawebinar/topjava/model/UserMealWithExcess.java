@@ -7,17 +7,23 @@ public class UserMealWithExcess {
     private final LocalDateTime dateTime;
     private final String description;
     private final int calories;
+    private final boolean excess;
     private final AtomicBoolean excessRef;
+
+    public UserMealWithExcess(LocalDateTime dateTime, String description, int calories, boolean excess) {
+        this.dateTime = dateTime;
+        this.description = description;
+        this.calories = calories;
+        this.excess = excess;
+        this.excessRef = new AtomicBoolean(false); //заглушка для простого решения
+    }
 
     public UserMealWithExcess(LocalDateTime dateTime, String description, int calories, AtomicBoolean excessRef) {
         this.dateTime = dateTime;
         this.description = description;
         this.calories = calories;
         this.excessRef = excessRef;
-    }
-
-    public UserMealWithExcess(UserMeal userMeal, AtomicBoolean excessRef) {
-        this(userMeal.getDateTime(), userMeal.getDescription(), userMeal.getCalories(), excessRef);
+        this.excess = false; //заглушка для простого решения
     }
 
     @Override
@@ -26,7 +32,8 @@ public class UserMealWithExcess {
                 "dateTime=" + dateTime +
                 ", description='" + description + '\'' +
                 ", calories=" + calories +
-                ", excess=" + excessRef.get() +
+                ", excess=" + excess +
+                ", excessRef=" + excessRef.get() +
                 '}';
     }
 }

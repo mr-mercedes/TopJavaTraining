@@ -26,9 +26,13 @@ public class UserMealsUtil {
                 new UserMeal(LocalDateTime.of(2020, Month.FEBRUARY, 1, 12, 0), "Ровно в endTime", 800),
                 new UserMeal(LocalDateTime.of(2020, Month.FEBRUARY, 1, 15, 0), "После endTime", 1000)
         );
-        System.out.println("Filtered by Cycles");
-        List<UserMealWithExcess> mealsToCycles = filteredByCycles(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
+        System.out.println("Filtered by Simple Cycles");
+        List<UserMealWithExcess> mealsToCycles = filteredByCyclesSimple(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
         mealsToCycles.forEach(System.out::println);
+        System.out.println("\n");
+        System.out.println("Filtered by Cycles");
+        List<UserMealWithExcess> mealsToSimpleCycles = filteredByCycles(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
+        mealsToSimpleCycles.forEach(System.out::println);
         System.out.println("\n");
         System.out.println("Filtered by Streams");
         List<UserMealWithExcess> mealsToStreams = filteredByStreams(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
@@ -37,10 +41,16 @@ public class UserMealsUtil {
 
     static class DayState {
         int sum;
+        final int limit;
         final AtomicBoolean excess = new AtomicBoolean(false);
 
-        public int getSum() {
-            return sum;
+        public DayState(int limit) {
+            this.limit = limit;
+        }
+
+        public void calculateCaloriesPerDayLimit(int mealCalories) {
+            this.sum += mealCalories;
+            if (this.sum > this.limit) excess.set(true);
         }
     }
 
@@ -48,15 +58,29 @@ public class UserMealsUtil {
         List<UserMealWithExcess> filteredMeals = new ArrayList<>();
         Map<LocalDate, DayState> days = new HashMap<>();
         meals.forEach(meal -> {
-            DayState st = days.computeIfAbsent(meal.getDateTime().toLocalDate(), k -> new DayState());
-            st.sum += meal.getCalories();
-            if (st.getSum() > caloriesPerDay) {
-                st.excess.set(true);
-            }
+            DayState st = days.computeIfAbsent(meal.getDateTime().toLocalDate(), k -> new DayState(caloriesPerDay));
+            st.calculateCaloriesPerDayLimit(meal.getCalories());
             if (TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime)) {
-                filteredMeals.add(new UserMealWithExcess(meal, st.excess));
+                filteredMeals.add(toDTO(meal, st.excess));
             }
         });
+        return filteredMeals;
+    }
+
+    public static List<UserMealWithExcess> filteredByCyclesSimple(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
+        Map<LocalDate, Integer> caloriesByDay = new HashMap<>();
+        for (UserMeal meal : meals) {
+            caloriesByDay.merge(meal.getDateTime().toLocalDate(), meal.getCalories(), Integer::sum);
+        }
+
+        List<UserMealWithExcess> filteredMeals = new ArrayList<>();
+        for (UserMeal meal : meals) {
+            if (TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime)) {
+                int totalDayCalories = caloriesByDay.get(meal.getDateTime().toLocalDate());
+                boolean excess = totalDayCalories > caloriesPerDay;
+                filteredMeals.add(new UserMealWithExcess(meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess));
+            }
+        }
         return filteredMeals;
     }
 
@@ -70,22 +94,16 @@ public class UserMealsUtil {
                 Acc::new,
                 ((acc, meal) -> {
                     LocalDate day = meal.getDateTime().toLocalDate();
-                    DayState st = acc.days.computeIfAbsent(day, k -> new DayState());
-                    st.sum += meal.getCalories();
-                    if (st.sum > caloriesPerDay) {
-                        st.excess.set(true);
-                    }
+                    DayState st = acc.days.computeIfAbsent(day, k -> new DayState(caloriesPerDay));
+                    st.calculateCaloriesPerDayLimit(meal.getCalories());
                     if (TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime)) {
                         acc.inWindow.add(meal);
                     }
                 }),
                 ((a1, a2) -> {
                     a2.days.forEach((day, st2) -> {
-                        DayState st1 = a1.days.computeIfAbsent(day, k -> new DayState());
-                        st1.sum += st2.sum;
-                        if (st1.sum > caloriesPerDay) {
-                            st1.excess.set(true);
-                        }
+                        DayState st1 = a1.days.computeIfAbsent(day, k -> new DayState(caloriesPerDay));
+                        st1.calculateCaloriesPerDayLimit(st2.sum);
                     });
                     a1.inWindow.addAll(a2.inWindow);
                     return a1;
@@ -94,10 +112,20 @@ public class UserMealsUtil {
                     List<UserMealWithExcess> res = new ArrayList<>(acc.inWindow.size());
                     acc.inWindow.forEach(m -> {
                         DayState st = acc.days.get(m.getDateTime().toLocalDate());
-                        res.add(new UserMealWithExcess(m, st.excess));
+                        res.add(toDTO(m, st.excess));
                     });
                     return res;
                 })
         ));
     }
+
+    public static UserMealWithExcess toDTO(UserMeal meal, AtomicBoolean excessRef) {
+        return new UserMealWithExcess(
+                meal.getDateTime(),
+                meal.getDescription(),
+                meal.getCalories(),
+                excessRef
+        );
+    }
+
 }
