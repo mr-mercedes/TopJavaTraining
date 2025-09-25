@@ -53,7 +53,7 @@ public class UserMealsUtil {
             this.limit = limit;
         }
 
-        public void calculateCaloriesPerDayLimit(int mealCalories) {
+        public void addCalories(int mealCalories) {
             this.sum += mealCalories;
             if (this.sum > this.limit) excess.set(true);
         }
@@ -64,9 +64,9 @@ public class UserMealsUtil {
         Map<LocalDate, DayState> days = new HashMap<>();
         meals.forEach(meal -> {
             DayState st = days.computeIfAbsent(meal.getDateTime().toLocalDate(), k -> new DayState(caloriesPerDay));
-            st.calculateCaloriesPerDayLimit(meal.getCalories());
+            st.addCalories(meal.getCalories());
             if (TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime)) {
-                filteredMeals.add(toDTO(meal, st.excess));
+                filteredMeals.add(toDto(meal, st.excess));
             }
         });
         return filteredMeals;
@@ -100,7 +100,7 @@ public class UserMealsUtil {
                 ((acc, meal) -> {
                     LocalDate day = meal.getDateTime().toLocalDate();
                     DayState st = acc.days.computeIfAbsent(day, k -> new DayState(caloriesPerDay));
-                    st.calculateCaloriesPerDayLimit(meal.getCalories());
+                    st.addCalories(meal.getCalories());
                     if (TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime)) {
                         acc.inWindow.add(meal);
                     }
@@ -108,7 +108,7 @@ public class UserMealsUtil {
                 ((a1, a2) -> {
                     a2.days.forEach((day, st2) -> {
                         DayState st1 = a1.days.computeIfAbsent(day, k -> new DayState(caloriesPerDay));
-                        st1.calculateCaloriesPerDayLimit(st2.sum);
+                        st1.addCalories(st2.sum);
                     });
                     a1.inWindow.addAll(a2.inWindow);
                     return a1;
@@ -117,7 +117,7 @@ public class UserMealsUtil {
                     List<UserMealWithExcess> res = new ArrayList<>(acc.inWindow.size());
                     acc.inWindow.forEach(m -> {
                         DayState st = acc.days.get(m.getDateTime().toLocalDate());
-                        res.add(toDTO(m, st.excess));
+                        res.add(toDto(m, st.excess));
                     });
                     return res;
                 })
@@ -141,7 +141,7 @@ public class UserMealsUtil {
                 .collect(Collectors.toList());
     }
 
-    public static UserMealWithExcess toDTO(UserMeal meal, AtomicBoolean excessRef) {
+    public static UserMealWithExcess toDto(UserMeal meal, AtomicBoolean excessRef) {
         return new UserMealWithExcess(
                 meal.getDateTime(),
                 meal.getDescription(),
