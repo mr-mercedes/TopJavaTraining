@@ -2,17 +2,17 @@ package ru.javawebinar.topjava.util;
 
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
+import ru.javawebinar.topjava.repository.impl.MealRepository;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class MealsUtil {
     public static void main(String[] args) {
-        List<MealTo> mealsTo = filteredByStreams(Constants.MEALS, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
+        List<MealTo> mealsTo = filteredByStreams(MealRepository.demoMeals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
         mealsTo.forEach(System.out::println);
     }
 
@@ -25,15 +25,18 @@ public class MealsUtil {
                 .collect(
                         Collectors.toMap(Meal::getDate, Meal::getCalories, Integer::sum)
                 );
-        Stream<MealTo> mealToStream = meals.stream()
-                .map(meal -> createTo(meal, caloriesSumByDate.get(meal.getDate()) > caloriesPerDay));
 
-        if (startTime == null || endTime == null) {
-            return mealToStream.collect(Collectors.toList());
-        }
+        final boolean noTimeFilter = (startTime == null && endTime == null);
+        final LocalTime start = (startTime != null) ? startTime : LocalTime.MIN;
+        final LocalTime end = (endTime != null) ? endTime : LocalTime.MAX;
 
-        return mealToStream
-                .filter(meal -> TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime))
+        return meals.stream()
+                .filter(m -> noTimeFilter ||
+                        TimeUtil.isBetweenHalfOpen(m.getDateTime().toLocalTime(), start, end))
+                .map(m -> createTo(
+                        m,
+                        caloriesSumByDate.get(m.getDate()) > caloriesPerDay
+                ))
                 .collect(Collectors.toList());
     }
 

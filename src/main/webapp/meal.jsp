@@ -13,32 +13,24 @@
 <h3><a href="index.html">Home</a></h3>
 <hr>
 <div class="from-wrapper">
-    <%
-        String action = request.getParameter("action");
-        boolean closeId = true;
-        if (action.equals("create")) {
-            closeId = false;
-    %>
-    <h2>Create meal</h2>
-    <% } else {
-    %>
-    <h2>Edit meal</h2>
-    <%
-        }
-    %>
+    <c:choose>
+        <c:when test="${meal.id > 0}">
+            <h2>Edit meal</h2>
+        </c:when>
+        <c:otherwise>
+            <h2>Create meal</h2>
+        </c:otherwise>
+    </c:choose>
     <form class="form" method="post" action="meals" name="form-add-meal">
-        <% if (closeId) { %>
-        <label>
-            <span>Meal ID:</span>
-            <input
-                    class="form-input"
-                    id="meal-id"
-                    type="text"
-                    name="mealId"
-                    readonly="readonly"
-                    value="<c:out value="${meal.id}" />"/></label>
+        <input
+                class="form-input"
+                style="display: none"
+                id="meal-id"
+                type="text"
+                name="mealId"
+                readonly="readonly"
+                value="${meal.id}"/>
 
-        <% } %>
         <label>
             <span>DateTime:</span>
             <input
@@ -56,7 +48,8 @@
                     id="description"
                     type="text"
                     name="description"
-                    value="<c:out value="${meal.description}" />"/></label>
+                    value="${meal.description}"/>
+        </label>
 
 
         <label>
@@ -66,7 +59,7 @@
                     id="calories"
                     type="number"
                     name="calories"
-                    value="<c:out value="${meal.calories}" />"/>
+                    value="${meal.calories}"/>
         </label>
 
 

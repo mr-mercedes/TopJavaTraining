@@ -13,7 +13,7 @@
 <h3><a href="index.html">Home</a></h3>
 <hr>
 <h2>Meals</h2>
-<h4><a href="meals?action=create">Add Meal</a></h4>
+<h4><a href="meals?action=edit">Add Meal</a></h4>
 <table>
     <tr>
         <th>Дата/Время</th>
