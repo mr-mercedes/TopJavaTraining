@@ -20,7 +20,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class MealServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger log = getLogger(MealServlet.class);
-    private static final int caloriesPerDay = 2000;
+    private final int caloriesPerDay = 2000;
     private MealRepository mealRepository;
 
     @Override
