@@ -13,14 +13,7 @@
 <h3><a href="index.html">Home</a></h3>
 <hr>
 <div class="from-wrapper">
-    <c:choose>
-        <c:when test="${meal.id > 0}">
-            <h2>Edit meal</h2>
-        </c:when>
-        <c:otherwise>
-            <h2>Create meal</h2>
-        </c:otherwise>
-    </c:choose>
+    <h2>${meal.id != null ? 'Edit meal' : 'Create meal'}</h2>
     <form class="form" method="post" action="meals" name="form-add-meal">
         <input
                 class="form-input"

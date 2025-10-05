@@ -5,8 +5,6 @@ import java.util.Optional;
 
 public interface CrudRepository<T, ID> {
 
-    boolean exists(ID id);
-
     List<T> findAll();
 
     T create(T entity);
