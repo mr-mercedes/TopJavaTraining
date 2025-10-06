@@ -8,17 +8,13 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MealInMemoryRepository implements CrudRepository<Meal, Integer> {
+public class InMemoryMealRepository implements CrudRepository<Meal, Integer> {
 
     private final AtomicInteger idGenerator = new AtomicInteger(0);
     final Map<Integer, Meal> meals = new ConcurrentHashMap<>();
 
-    public MealInMemoryRepository() {
-        startFill(meals);
-    }
-
-    private void startFill(Map<Integer, Meal> meals) {
-        final List<Meal> demoMeals = Arrays.asList(
+    {
+        Arrays.asList(
                 new Meal(1, LocalDateTime.of(2025, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
                 new Meal(2, LocalDateTime.of(2025, Month.JANUARY, 30, 13, 0), "Обед", 1000),
                 new Meal(3, LocalDateTime.of(2025, Month.JANUARY, 30, 20, 0), "Ужин", 500),
@@ -26,10 +22,7 @@ public class MealInMemoryRepository implements CrudRepository<Meal, Integer> {
                 new Meal(5, LocalDateTime.of(2025, Month.JANUARY, 31, 10, 0), "Завтрак", 1000),
                 new Meal(6, LocalDateTime.of(2025, Month.JANUARY, 31, 13, 0), "Обед", 500),
                 new Meal(7, LocalDateTime.of(2025, Month.JANUARY, 31, 20, 0), "Ужин", 410)
-        );
-        for (Meal meal : demoMeals) {
-            meals.put(meal.getId(), meal);
-        }
+        ).forEach(this::create);
     }
 
     @Override
@@ -38,14 +31,14 @@ public class MealInMemoryRepository implements CrudRepository<Meal, Integer> {
     }
 
     @Override
-    public Meal create(Meal entity) {
+    public synchronized Meal create(Meal entity) {
         entity.setId(idGenerator.incrementAndGet());
         meals.put(entity.getId(), entity);
         return meals.get(entity.getId());
     }
 
     @Override
-    public Meal update(Meal entity) {
+    public synchronized Meal update(Meal entity) {
         meals.replace(entity.getId(), entity);
         return meals.get(entity.getId());
     }
