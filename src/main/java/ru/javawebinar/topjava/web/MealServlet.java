@@ -3,6 +3,7 @@ package ru.javawebinar.topjava.web;
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
+import ru.javawebinar.topjava.repository.CrudRepository;
 import ru.javawebinar.topjava.repository.InMemoryMealRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
 
@@ -22,11 +23,11 @@ public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
     private static final int CALORIES_PER_DAY = 2000;
     public static final String INSERT_OR_EDIT = "/meal.jsp";
-    private InMemoryMealRepository inMemoryMealRepository;
+    private CrudRepository<Meal, Integer> mealRepository;
 
     @Override
     public void init() {
-        this.inMemoryMealRepository = new InMemoryMealRepository();
+        this.mealRepository = new InMemoryMealRepository();
     }
 
     @Override
@@ -60,7 +61,7 @@ public class MealServlet extends HttpServlet {
 
     private void edit(HttpServletRequest request, String mealId) {
         int id = Integer.parseInt(mealId);
-        MealTo meal = inMemoryMealRepository.findById(id)
+        MealTo meal = mealRepository.findById(id)
                 .map(m -> new MealTo(
                         m.getId(),
                         m.getDateTime(),
@@ -75,14 +76,14 @@ public class MealServlet extends HttpServlet {
 
     private void delete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int mealId = Integer.parseInt(request.getParameter("mealId"));
-        inMemoryMealRepository.delete(mealId);
+        mealRepository.delete(mealId);
         response.sendRedirect(request.getContextPath() + "/meals");
         log.debug("success delete meal");
     }
 
     private void get(HttpServletRequest request) {
         List<MealTo> meals = MealsUtil.filteredByStreams(
-                inMemoryMealRepository.findAll(),
+                mealRepository.findAll(),
                 CALORIES_PER_DAY);
         request.setAttribute("meals", meals);
         log.debug("success get meals meal");
@@ -106,14 +107,14 @@ public class MealServlet extends HttpServlet {
         String mealId = request.getParameter("mealId");
         if (mealId == null || mealId.isEmpty()) {
             log.debug("post create meal");
-            Meal meal = new Meal(dateTime, description, calories);
-            inMemoryMealRepository.create(meal);
+            Meal meal = Meal.draft(dateTime, description, calories);
+            mealRepository.create(meal);
             log.debug("success create meal");
         } else {
             log.debug("post edit meal");
             int id = Integer.parseInt(mealId);
-            Meal updatedMeal = new Meal(id, dateTime, description, calories);
-            inMemoryMealRepository.update(updatedMeal);
+            Meal updatedMeal = Meal.of(id, dateTime, description, calories);
+            mealRepository.update(updatedMeal);
             log.debug("success update meal");
         }
         response.sendRedirect(request.getContextPath() + "/meals");

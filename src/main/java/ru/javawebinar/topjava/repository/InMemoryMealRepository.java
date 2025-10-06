@@ -31,16 +31,17 @@ public class InMemoryMealRepository implements CrudRepository<Meal, Integer> {
     }
 
     @Override
-    public synchronized Meal create(Meal entity) {
-        entity.setId(idGenerator.incrementAndGet());
-        meals.put(entity.getId(), entity);
-        return meals.get(entity.getId());
+    public Meal create(Meal entity) {
+        int id = idGenerator.incrementAndGet();
+        Meal meal = entity.withId(id);
+        meals.put(id, meal);
+        return meal;
     }
 
     @Override
-    public synchronized Meal update(Meal entity) {
-        meals.replace(entity.getId(), entity);
-        return meals.get(entity.getId());
+    public Meal update(Meal entity) {
+        Integer id = entity.getId();
+        return meals.computeIfPresent(id, (k, v) -> entity);
     }
 
     @Override
