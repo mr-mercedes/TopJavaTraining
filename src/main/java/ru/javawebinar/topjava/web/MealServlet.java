@@ -107,7 +107,7 @@ public class MealServlet extends HttpServlet {
         String mealId = request.getParameter("mealId");
         if (mealId == null || mealId.isEmpty()) {
             log.debug("post create meal");
-            Meal meal = Meal.draft(dateTime, description, calories);
+            Meal meal = Meal.of(dateTime, description, calories);
             mealRepository.create(meal);
             log.debug("success create meal");
         } else {

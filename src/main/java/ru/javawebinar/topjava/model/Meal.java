@@ -23,7 +23,7 @@ public class Meal {
         this.calories = calories;
     }
 
-    public static Meal draft(LocalDateTime dateTime, String description, int calories) {
+    public static Meal of(LocalDateTime dateTime, String description, int calories) {
         return new Meal(null, dateTime, description, calories);
     }
 
