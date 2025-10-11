@@ -7,11 +7,11 @@ import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 import ru.javawebinar.topjava.util.CompareUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryUserRepository implements UserRepository {
@@ -45,7 +45,9 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public List<User> getAll() {
         log.info("getAll");
-        return CompareUtil.sortByName(new ArrayList<>(usersMap.values()));
+        return usersMap.values().stream()
+                .sorted(CompareUtil.compareByName())
+                .collect(Collectors.toList());
     }
 
     @Override
