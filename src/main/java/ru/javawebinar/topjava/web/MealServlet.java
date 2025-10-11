@@ -42,7 +42,7 @@ public class MealServlet extends HttpServlet {
                 Integer.parseInt(request.getParameter("calories")));
 
         log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
-        mealRestController.createWithLocation(MealsUtil.createTo(meal, true));
+        mealRestController.create(MealsUtil.createTo(meal, true));
         response.sendRedirect("meals");
     }
 

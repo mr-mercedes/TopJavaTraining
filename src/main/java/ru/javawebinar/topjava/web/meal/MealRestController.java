@@ -22,34 +22,40 @@ public class MealRestController {
     }
 
     public List<MealTo> getAll() {
+        log.info("MealRestController getAll");
         int userId = SecurityUtil.authUserId();
         int caloriesPerDay = SecurityUtil.authUserCaloriesPerDay();
         return service.getAll(userId, caloriesPerDay);
     }
 
     public MealTo getById(int id) {
+        log.info("MealRestController getById: {}", id);
         int userId = SecurityUtil.authUserId();
         return service.get(userId, id);
     }
 
-    public MealTo createWithLocation(MealTo mealTo) {
+    public MealTo create(MealTo mealTo) {
+        log.info("MealRestController create: {}", mealTo);
         int userId = SecurityUtil.authUserId();
         Meal meal = MealsUtil.fromTo(mealTo);
         return service.createWithLocation(userId, meal);
     }
 
     public MealTo update(MealTo mealTo) {
+        log.info("MealRestController update: {}", mealTo);
         int userId = SecurityUtil.authUserId();
         Meal meal = MealsUtil.fromTo(mealTo);
         return service.update(userId, meal);
     }
 
     public void delete(int id) {
+        log.info("MealRestController delete id: {}", id);
         int userId = SecurityUtil.authUserId();
         service.delete(userId, id);
     }
 
     public List<MealTo> getBetween(LocalDateTime from, LocalDateTime to) {
+        log.info("MealRestController getBetween");
         int userId = SecurityUtil.authUserId();
         int caloriesPerDay = SecurityUtil.authUserCaloriesPerDay();
         return service.getBetween(userId, caloriesPerDay, from, to);

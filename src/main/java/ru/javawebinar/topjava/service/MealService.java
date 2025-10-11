@@ -7,12 +7,12 @@ import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.util.ValidationUtil;
+import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class MealService {
@@ -24,7 +24,7 @@ public class MealService {
     }
 
     public List<MealTo> getAll(int userId, int caloriesPerDay) {
-        return new ArrayList<>(MealsUtil.getTos(repository.getAll(userId), caloriesPerDay));
+        return new ArrayList<>(MealsUtil.getTos(repository.getAll(userId, meal -> true), caloriesPerDay));
     }
 
     public MealTo createWithLocation(int userId, Meal meal) {
@@ -40,21 +40,18 @@ public class MealService {
 
     public MealTo update(int userId, Meal meal) {
         Meal updated = repository.save(userId, meal);
+        ValidationUtil.checkNotFound(updated, "Meal with id " + updated.getId() + " not found");
         return MealsUtil.createTo(updated, true);
     }
 
     public void delete(int userId, int mealId) {
-        repository.delete(userId, mealId);
+        if (!repository.delete(userId, mealId)) {
+            throw new NotFoundException("Meal with id " + mealId + " not found");
+        }
     }
 
     public List<MealTo> getBetween(int userId, int caloriesPerDay, LocalDateTime from, LocalDateTime to) {
-        Collection<Meal> meals = repository.getAll(userId);
-
-        List<Meal> filteredMeal = meals.stream()
-                .filter(meal -> DateTimeUtil.isBetweenHalfOpen(meal.getDate(), from.toLocalDate(), to.toLocalDate()))
-                .filter(meal -> DateTimeUtil.isBetweenHalfOpen(meal.getTime(), from.toLocalTime(), to.toLocalTime()))
-                .collect(Collectors.toList());
-
-        return MealsUtil.getTos(filteredMeal, caloriesPerDay);
+        Collection<Meal> meals = repository.getAll(userId, meal -> DateTimeUtil.isBetweenHalfOpen(meal.getDate(), from.toLocalDate(), to.toLocalDate()));
+        return MealsUtil.getFilteredTos(meals, caloriesPerDay, from.toLocalTime(), to.toLocalTime());
     }
 }
