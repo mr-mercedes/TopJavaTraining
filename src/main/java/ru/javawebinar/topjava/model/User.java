@@ -2,11 +2,12 @@ package ru.javawebinar.topjava.model;
 
 import org.springframework.util.CollectionUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static ru.javawebinar.topjava.util.MealsUtil.DEFAULT_CALORIES_PER_DAY;
 
-public class User extends AbstractNamedEntity {
+public class User extends AbstractNamedEntity implements Comparable<User> {
 
     private String email;
 
@@ -91,5 +92,12 @@ public class User extends AbstractNamedEntity {
                 ", roles=" + roles +
                 ", caloriesPerDay=" + caloriesPerDay +
                 '}';
+    }
+
+    @Override
+    public int compareTo(User o) {
+        return Comparator.comparing(User::getName, String.CASE_INSENSITIVE_ORDER)
+                .thenComparing(User::getId)
+                .compare(this, o);
     }
 }

@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
-import ru.javawebinar.topjava.util.CompareUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -46,7 +45,7 @@ public class InMemoryUserRepository implements UserRepository {
     public List<User> getAll() {
         log.info("getAll");
         return usersMap.values().stream()
-                .sorted(CompareUtil.compareByName())
+                .sorted()
                 .collect(Collectors.toList());
     }
 
