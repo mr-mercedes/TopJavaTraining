@@ -9,9 +9,7 @@ import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.SecurityUtil;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 @Controller
@@ -51,11 +49,9 @@ public class MealRestController {
         service.delete(userId, id);
     }
 
-    public List<MealTo> getBetween(String startDate, String endDate, String startTime, String endTime) {
+    public List<MealTo> getBetween(LocalDateTime from, LocalDateTime to) {
         int userId = SecurityUtil.authUserId();
         int caloriesPerDay = SecurityUtil.authUserCaloriesPerDay();
-        LocalDateTime start = LocalDateTime.of(LocalDate.parse(startDate), LocalTime.parse(startTime));
-        LocalDateTime end = LocalDateTime.of(LocalDate.parse(endDate), LocalTime.parse(endTime));
-        return service.getBetween(userId, caloriesPerDay, start, end);
+        return service.getBetween(userId, caloriesPerDay, from, to);
     }
 }

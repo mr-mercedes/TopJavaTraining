@@ -5,23 +5,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.model.Role;
-import ru.javawebinar.topjava.model.User;
-import ru.javawebinar.topjava.repository.MealRepository;
-import ru.javawebinar.topjava.repository.inmemory.InMemoryMealRepository;
-import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.meal.MealRestController;
-import ru.javawebinar.topjava.web.user.AdminRestController;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.Objects;
 
 public class MealServlet extends HttpServlet {
@@ -54,7 +49,6 @@ public class MealServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-        int userId = SecurityUtil.authUserId();
 
         switch (action == null ? "all" : action) {
             case "delete":
@@ -70,6 +64,23 @@ public class MealServlet extends HttpServlet {
                         MealsUtil.fromTo(mealRestController.getById(getId(request)));
                 request.setAttribute("meal", meal);
                 request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
+                break;
+            case "filter":
+                log.info("filter");
+                String endDate = request.getParameter("endDate");
+                String endTime = request.getParameter("endTime");
+                String startDate = request.getParameter("startDate");
+                String startTime = request.getParameter("startTime");
+
+                LocalDateTime from = LocalDateTime.of(
+                        startDate.isEmpty() ? LocalDate.MIN : LocalDate.parse(startDate),
+                        startTime.isEmpty() ? LocalTime.MIN : LocalTime.parse(startTime));
+                LocalDateTime to = LocalDateTime.of(
+                        endDate.isEmpty() ? LocalDate.MAX : LocalDate.parse(endDate),
+                        endTime.isEmpty() ? LocalTime.MAX : LocalTime.parse(endTime));
+
+                request.setAttribute("meals", mealRestController.getBetween(from, to));
+                request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
             case "all":
             default:
