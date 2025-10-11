@@ -5,42 +5,53 @@ import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class InMemoryMealRepository implements MealRepository {
-    private final Map<Integer, Meal> mealsMap = new ConcurrentHashMap<>();
+    //Map<UserId, Map<MealId, Meal>
+    private final Map<Integer, Map<Integer, Meal>> mealsMap = new ConcurrentHashMap<>();
     private final AtomicInteger counter = new AtomicInteger(0);
 
     {
-        MealsUtil.meals.forEach(this::save);
+        int defaultUserId = 1;
+        MealsUtil.meals.forEach(meal -> save(defaultUserId, meal));
     }
 
     @Override
-    public Meal save(Meal meal) {
+    public Meal save(int userId, Meal meal) {
         if (meal.isNew()) {
             meal.setId(counter.incrementAndGet());
-            mealsMap.put(meal.getId(), meal);
+            mealsMap.computeIfAbsent(userId, k -> new ConcurrentHashMap<>()).put(meal.getId(), meal);
             return meal;
         }
         // handle case: update, but not present in storage
-        return mealsMap.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
+        mealsMap.computeIfPresent(userId, (id, userMeals) -> {
+            userMeals.computeIfPresent(meal.getId(), (mealId, oldMeal) -> meal);
+            return userMeals;
+        });
+        return get(userId, meal.getId());
     }
 
     @Override
-    public boolean delete(int id) {
-        return mealsMap.remove(id) != null;
+    public boolean delete(int userId, int id) {
+        return mealsMap.getOrDefault(userId, new HashMap<>()).remove(id) != null;
     }
 
     @Override
-    public Meal get(int id) {
-        return mealsMap.get(id);
+    public Meal get(int userId, int id) {
+        return mealsMap.get(userId).get(id);
     }
 
     @Override
     public Collection<Meal> getAll() {
-        return mealsMap.values();
+        return mealsMap.values().stream()
+                .flatMap(m -> m.values().stream())
+                .sorted()
+                .collect(Collectors.toList());
     }
 }
 
