@@ -4,7 +4,6 @@ import ru.javawebinar.topjava.model.Meal;
 
 import java.util.Collection;
 
-
 public interface MealRepository {
 
     Meal save(int userId, Meal meal);
@@ -13,5 +12,5 @@ public interface MealRepository {
 
     Meal get(int userId, int id);
 
-    Collection<Meal> getAll();
+    Collection<Meal> getAll(int userId);
 }
