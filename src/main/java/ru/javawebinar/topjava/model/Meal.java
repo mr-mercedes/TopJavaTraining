@@ -3,9 +3,8 @@ package ru.javawebinar.topjava.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Comparator;
 
-public class Meal extends AbstractBaseEntity implements Comparable<Meal> {
+public class Meal extends AbstractBaseEntity {
 
     private final LocalDateTime dateTime;
 
@@ -52,12 +51,5 @@ public class Meal extends AbstractBaseEntity implements Comparable<Meal> {
                 ", calories=" + calories +
                 ", id=" + id +
                 '}';
-    }
-
-    @Override
-    public int compareTo(Meal o) {
-        return Comparator.comparing(Meal::getDateTime)
-                .reversed()
-                .compare(this, o);
     }
 }

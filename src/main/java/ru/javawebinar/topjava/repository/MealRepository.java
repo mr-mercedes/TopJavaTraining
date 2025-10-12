@@ -2,8 +2,8 @@ package ru.javawebinar.topjava.repository;
 
 import ru.javawebinar.topjava.model.Meal;
 
-import java.util.Collection;
-import java.util.function.Predicate;
+import java.time.LocalDate;
+import java.util.List;
 
 public interface MealRepository {
 
@@ -13,5 +13,7 @@ public interface MealRepository {
 
     Meal get(int userId, int id);
 
-    Collection<Meal> getAll(int userId, Predicate<Meal> predicate);
+    List<Meal> getAll(int userId, LocalDate from, LocalDate to);
+
+    List<Meal> getAll();
 }

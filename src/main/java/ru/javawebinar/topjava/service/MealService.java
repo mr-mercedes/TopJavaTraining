@@ -4,14 +4,11 @@ import org.springframework.stereotype.Service;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.to.MealTo;
-import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.util.ValidationUtil;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -23,11 +20,11 @@ public class MealService {
         this.repository = repository;
     }
 
-    public List<MealTo> getAll(int userId, int caloriesPerDay) {
-        return new ArrayList<>(MealsUtil.getTos(repository.getAll(userId, meal -> true), caloriesPerDay));
+    public List<MealTo> getAll(int caloriesPerDay) {
+        return MealsUtil.getTos(repository.getAll(), caloriesPerDay);
     }
 
-    public MealTo createWithLocation(int userId, Meal meal) {
+    public MealTo create(int userId, Meal meal) {
         Meal save = repository.save(userId, meal);
         return MealsUtil.createTo(save, true);
     }
@@ -38,10 +35,9 @@ public class MealService {
         return MealsUtil.createTo(meal, true);
     }
 
-    public MealTo update(int userId, Meal meal) {
+    public void update(int userId, Meal meal) {
         Meal updated = repository.save(userId, meal);
         ValidationUtil.checkNotFound(updated, "Meal with id " + updated.getId() + " not found");
-        return MealsUtil.createTo(updated, true);
     }
 
     public void delete(int userId, int mealId) {
@@ -51,7 +47,7 @@ public class MealService {
     }
 
     public List<MealTo> getBetween(int userId, int caloriesPerDay, LocalDateTime from, LocalDateTime to) {
-        Collection<Meal> meals = repository.getAll(userId, meal -> DateTimeUtil.isBetweenHalfOpen(meal.getDate(), from.toLocalDate(), to.toLocalDate()));
+        List<Meal> meals = repository.getAll(userId, from.toLocalDate(), to.toLocalDate());
         return MealsUtil.getFilteredTos(meals, caloriesPerDay, from.toLocalTime(), to.toLocalTime());
     }
 }
