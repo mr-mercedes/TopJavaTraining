@@ -13,12 +13,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryMealRepository implements MealRepository {
     private final Map<Integer, Map<Integer, Meal>> mealsMap = new ConcurrentHashMap<>();
     private final AtomicInteger counter = new AtomicInteger(0);
+    private static final Function<Integer, Map<Integer, Meal>> NEW_MEAL_MAP = k -> new ConcurrentHashMap<>();
 
     {
         int adminId = 1;
@@ -57,17 +59,17 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public boolean delete(int userId, int id) {
-        return mealsMap.computeIfAbsent(userId, k -> new ConcurrentHashMap<>()).remove(id) != null;
+        return mealsMap.computeIfAbsent(userId, NEW_MEAL_MAP).remove(id) != null;
     }
 
     @Override
     public Meal get(int userId, int id) {
-        return mealsMap.computeIfAbsent(userId, k -> new ConcurrentHashMap<>()).get(id);
+        return mealsMap.computeIfAbsent(userId, NEW_MEAL_MAP).get(id);
     }
 
     @Override
     public List<Meal> getBetween(int userId, LocalDateTime from, LocalDateTime to) {
-        return mealsMap.computeIfAbsent(userId, meal -> new ConcurrentHashMap<>())
+        return mealsMap.computeIfAbsent(userId, NEW_MEAL_MAP)
                 .values().stream()
                 .filter(meal -> DateTimeUtil.isBetweenDates(meal.getDate(), from.toLocalDate(), to.toLocalDate()))
                 .sorted(Comparator.comparing(Meal::getDateTime).reversed())
@@ -76,7 +78,7 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public List<Meal> getAll(int userId) {
-        return mealsMap.computeIfAbsent(userId, k -> new ConcurrentHashMap<>()).values().stream()
+        return mealsMap.computeIfAbsent(userId, NEW_MEAL_MAP).values().stream()
                 .sorted(Comparator.comparing(Meal::getDateTime).reversed())
                 .collect(Collectors.toList());
     }
