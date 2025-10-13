@@ -25,8 +25,9 @@ public class MealRestController {
         this.service = service;
     }
 
-    public List<MealTo> getAll(int userId) {
+    public List<MealTo> getAll() {
         log.info("MealRestController getAll");
+        int userId = SecurityUtil.authUserId();
         int caloriesPerDay = SecurityUtil.authUserCaloriesPerDay();
         return service.getAll(userId, caloriesPerDay);
     }

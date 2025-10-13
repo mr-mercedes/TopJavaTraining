@@ -8,11 +8,11 @@ import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Repository
@@ -29,21 +29,30 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public Meal save(int userId, Meal meal) {
+        AtomicReference<Meal> mealRef = new AtomicReference<>();
         mealsMap.compute(userId, (id, userMeals) -> {
-            Map<Integer, Meal> map = (userMeals != null)
-                    ? userMeals
-                    : new ConcurrentHashMap<>();
-
             if (meal.isNew()) {
+                Map<Integer, Meal> map = (userMeals != null)
+                        ? userMeals
+                        : new ConcurrentHashMap<>();
                 int newId = counter.incrementAndGet();
                 meal.setId(newId);
                 map.put(newId, meal);
-            } else {
-                map.computeIfPresent(meal.getId(), (mid, old) -> meal);
+                mealRef.set(meal);
+                return map;
             }
-            return map;
+
+            if (userMeals == null) {
+                return null;
+            }
+
+            userMeals.computeIfPresent(meal.getId(), (mid, old) -> {
+                mealRef.set(meal);
+                return meal;
+            });
+            return userMeals;
         });
-        return meal;
+        return mealRef.get();
     }
 
     @Override
@@ -58,9 +67,9 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public List<Meal> getBetween(int userId, LocalDateTime from, LocalDateTime to) {
-        return mealsMap.computeIfAbsent(userId, meal -> new HashMap<>())
+        return mealsMap.computeIfAbsent(userId, meal -> new ConcurrentHashMap<>())
                 .values().stream()
-                .filter(meal -> DateTimeUtil.isBetweenHalfOpen(meal.getDateTime(), from, to))
+                .filter(meal -> DateTimeUtil.isBetweenDates(meal.getDate(), from.toLocalDate(), to.toLocalDate()))
                 .sorted(Comparator.comparing(Meal::getDateTime).reversed())
                 .collect(Collectors.toList());
     }
