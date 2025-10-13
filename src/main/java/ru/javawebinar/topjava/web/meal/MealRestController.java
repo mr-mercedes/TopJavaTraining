@@ -13,6 +13,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
+import static ru.javawebinar.topjava.util.ValidationUtil.checkIsNew;
+
 @Controller
 public class MealRestController {
     private final Logger log = LoggerFactory.getLogger(getClass());
@@ -22,27 +25,29 @@ public class MealRestController {
         this.service = service;
     }
 
-    public List<MealTo> getAll() {
+    public List<MealTo> getAll(int userId) {
         log.info("MealRestController getAll");
         int caloriesPerDay = SecurityUtil.authUserCaloriesPerDay();
-        return service.getAll(caloriesPerDay);
+        return service.getAll(userId, caloriesPerDay);
     }
 
-    public MealTo getById(int id) {
+    public Meal getById(int id) {
         log.info("MealRestController getById: {}", id);
         int userId = SecurityUtil.authUserId();
         return service.get(userId, id);
     }
 
-    public MealTo create(Meal meal) {
+    public Meal create(Meal meal) {
         log.info("MealRestController create: {}", meal);
         int userId = SecurityUtil.authUserId();
+        checkIsNew(meal);
         return service.create(userId, meal);
     }
 
-    public void update(Meal meal) {
-        log.info("MealRestController update: {}", meal);
+    public void update(Meal meal, int id) {
+        log.info("MealRestController update: {} with id={}", meal, id);
         int userId = SecurityUtil.authUserId();
+        assureIdConsistent(meal, id);
         service.update(userId, meal);
     }
 

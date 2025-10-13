@@ -20,19 +20,18 @@ public class MealService {
         this.repository = repository;
     }
 
-    public List<MealTo> getAll(int caloriesPerDay) {
-        return MealsUtil.getTos(repository.getAll(), caloriesPerDay);
+    public List<MealTo> getAll(int userId, int caloriesPerDay) {
+        return MealsUtil.getTos(repository.getAll(userId), caloriesPerDay);
     }
 
-    public MealTo create(int userId, Meal meal) {
-        Meal save = repository.save(userId, meal);
-        return MealsUtil.createTo(save, true);
+    public Meal create(int userId, Meal meal) {
+        return repository.save(userId, meal);
     }
 
-    public MealTo get(int userId, int mealId) {
+    public Meal get(int userId, int mealId) {
         Meal meal = repository.get(userId, mealId);
         ValidationUtil.checkNotFound(meal, "Meal with id " + mealId + " not found");
-        return MealsUtil.createTo(meal, true);
+        return meal;
     }
 
     public void update(int userId, Meal meal) {
@@ -47,7 +46,7 @@ public class MealService {
     }
 
     public List<MealTo> getBetween(int userId, int caloriesPerDay, LocalDateTime from, LocalDateTime to) {
-        List<Meal> meals = repository.getAll(userId, from.toLocalDate(), to.toLocalDate());
+        List<Meal> meals = repository.getBetween(userId, from, to);
         return MealsUtil.getFilteredTos(meals, caloriesPerDay, from.toLocalTime(), to.toLocalTime());
     }
 }
