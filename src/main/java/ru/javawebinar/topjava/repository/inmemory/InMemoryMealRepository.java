@@ -33,10 +33,10 @@ public class InMemoryMealRepository implements MealRepository {
     public Meal save(int userId, Meal meal) {
         AtomicReference<Meal> mealRef = new AtomicReference<>();
         mealsMap.compute(userId, (id, userMeals) -> {
+            Map<Integer, Meal> map = (userMeals != null)
+                    ? userMeals
+                    : new ConcurrentHashMap<>();
             if (meal.isNew()) {
-                Map<Integer, Meal> map = (userMeals != null)
-                        ? userMeals
-                        : new ConcurrentHashMap<>();
                 int newId = counter.incrementAndGet();
                 meal.setId(newId);
                 map.put(newId, meal);
@@ -44,15 +44,11 @@ public class InMemoryMealRepository implements MealRepository {
                 return map;
             }
 
-            if (userMeals == null) {
-                return null;
-            }
-
-            userMeals.computeIfPresent(meal.getId(), (mid, old) -> {
+            map.computeIfPresent(meal.getId(), (mid, old) -> {
                 mealRef.set(meal);
                 return meal;
             });
-            return userMeals;
+            return map;
         });
         return mealRef.get();
     }
