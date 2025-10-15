@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryMealRepository implements MealRepository {
-    private final Map<Integer, Map<Integer, Meal>> mealsMap = new ConcurrentHashMap<>();
+    private final Map<Integer, Map<Integer, Meal>> meals = new ConcurrentHashMap<>();
     private final AtomicInteger counter = new AtomicInteger(0);
     private static final Function<Integer, Map<Integer, Meal>> NEW_MEAL_MAP = k -> new ConcurrentHashMap<>();
 
@@ -31,41 +31,40 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public Meal save(int userId, Meal meal) {
-        AtomicReference<Meal> mealRef = new AtomicReference<>();
-        mealsMap.compute(userId, (id, userMeals) -> {
-            Map<Integer, Meal> map = (userMeals != null)
+        AtomicReference<Meal> result = new AtomicReference<>();
+        meals.compute(userId, (id, userMeals) -> {
+            Map<Integer, Meal> tmpUserMeals = (userMeals != null)
                     ? userMeals
                     : new ConcurrentHashMap<>();
             if (meal.isNew()) {
                 int newId = counter.incrementAndGet();
                 meal.setId(newId);
-                map.put(newId, meal);
-                mealRef.set(meal);
-                return map;
+                tmpUserMeals.put(newId, meal);
+                result.set(meal);
+            } else {
+                tmpUserMeals.computeIfPresent(meal.getId(), (mid, old) -> {
+                    result.set(meal);
+                    return meal;
+                });
             }
-
-            map.computeIfPresent(meal.getId(), (mid, old) -> {
-                mealRef.set(meal);
-                return meal;
-            });
-            return map;
+            return tmpUserMeals;
         });
-        return mealRef.get();
+        return result.get();
     }
 
     @Override
     public boolean delete(int userId, int id) {
-        return mealsMap.computeIfAbsent(userId, NEW_MEAL_MAP).remove(id) != null;
+        return meals.computeIfAbsent(userId, NEW_MEAL_MAP).remove(id) != null;
     }
 
     @Override
     public Meal get(int userId, int id) {
-        return mealsMap.computeIfAbsent(userId, NEW_MEAL_MAP).get(id);
+        return meals.computeIfAbsent(userId, NEW_MEAL_MAP).get(id);
     }
 
     @Override
     public List<Meal> getBetween(int userId, LocalDateTime from, LocalDateTime to) {
-        return mealsMap.computeIfAbsent(userId, NEW_MEAL_MAP)
+        return meals.computeIfAbsent(userId, NEW_MEAL_MAP)
                 .values().stream()
                 .filter(meal -> DateTimeUtil.isBetweenDates(meal.getDate(), from.toLocalDate(), to.toLocalDate()))
                 .sorted(Comparator.comparing(Meal::getDateTime).reversed())
@@ -74,7 +73,7 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public List<Meal> getAll(int userId) {
-        return mealsMap.computeIfAbsent(userId, NEW_MEAL_MAP).values().stream()
+        return meals.computeIfAbsent(userId, NEW_MEAL_MAP).values().stream()
                 .sorted(Comparator.comparing(Meal::getDateTime).reversed())
                 .collect(Collectors.toList());
     }
