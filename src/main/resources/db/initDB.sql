@@ -16,7 +16,7 @@ CREATE TABLE users
     calories_per_day INTEGER             DEFAULT 2000  NOT NULL
 );
 COMMENT ON TABLE users IS 'Users data';
-CREATE UNIQUE INDEX users_unique_email_idx ON users (email);
+CREATE UNIQUE INDEX IF NOT EXISTS users_unique_email_idx ON users (email);
 COMMENT ON INDEX users_unique_email_idx IS 'For quick search by email';
 
 
