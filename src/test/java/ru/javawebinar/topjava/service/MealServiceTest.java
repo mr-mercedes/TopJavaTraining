@@ -59,14 +59,14 @@ public class MealServiceTest {
     @Test
     public void updateNotFoundMeal() {
         Meal updated = getUpdated();
-        updated.setId(NOT_FOUND_MEAL);
+        updated.setId(NOT_FOUND_ID);
         assertThrows(NotFoundException.class, () -> service.update(updated, USER_ID));
     }
 
     @Test
     public void updateNotFoundUser() {
         Meal updated = getUpdated();
-        assertThrows(NotFoundException.class, () -> service.update(updated, NOT_FOUND_USER));
+        assertThrows(NotFoundException.class, () -> service.update(updated, NOT_FOUND_ID));
     }
 
     @Test
@@ -77,12 +77,12 @@ public class MealServiceTest {
 
     @Test
     public void getNotFoundMeal() {
-        assertThrows(NotFoundException.class, () -> service.get(NOT_FOUND_MEAL, USER_ID));
+        assertThrows(NotFoundException.class, () -> service.get(NOT_FOUND_ID, USER_ID));
     }
 
     @Test
     public void getNotFoundUser() {
-        assertThrows(NotFoundException.class, () -> service.get(MEAL_ID, NOT_FOUND_USER));
+        assertThrows(NotFoundException.class, () -> service.get(MEAL_ID, NOT_FOUND_ID));
     }
 
     @Test
@@ -93,12 +93,12 @@ public class MealServiceTest {
 
     @Test
     public void deleteNotFoundMeal() {
-        assertThrows(NotFoundException.class, () -> service.delete(NOT_FOUND_MEAL, USER_ID));
+        assertThrows(NotFoundException.class, () -> service.delete(NOT_FOUND_ID, USER_ID));
     }
 
     @Test
     public void deleteNotFoundUser() {
-        assertThrows(NotFoundException.class, () -> service.delete(MEAL_ID, NOT_FOUND_USER));
+        assertThrows(NotFoundException.class, () -> service.delete(MEAL_ID, NOT_FOUND_ID));
     }
 
     @Test

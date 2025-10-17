@@ -16,8 +16,7 @@ public class MealTestData {
     public static final int USER_ID = START_SEQ;
     public static final int ADMIN_ID = START_SEQ + 1;
     public static final int MEAL_ID = 100003;
-    public static final int NOT_FOUND_USER = 10;
-    public static final int NOT_FOUND_MEAL = 404;
+    public static final int NOT_FOUND_ID = 404;
     public static final LocalDate START_DATE = LocalDate.of(2020, Month.JANUARY, 30);
     public static final LocalDate END_DATE = LocalDate.of(2020, Month.JANUARY, 31);
 
