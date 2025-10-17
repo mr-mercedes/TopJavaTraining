@@ -21,23 +21,23 @@ public class MealTestData {
     public static final LocalDate START_DATE = LocalDate.of(2020, Month.JANUARY, 30);
     public static final LocalDate END_DATE = LocalDate.of(2020, Month.JANUARY, 31);
 
-    public static final LocalDateTime UPDATED_DATETIME =
+    private static final LocalDateTime UPDATED_DATETIME =
             LocalDateTime.of(1995, Month.MAY, 23, 10, 0);
-    public static final String UPDATED_DESCRIPTION = "Торт";
+    private static final String UPDATED_DESCRIPTION = "Торт";
 
     public static Meal USER_MEAL_STANDARD =
             new Meal(100003, LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500);
-    public static Meal USER_MEAL_01_30_2020_LAUNCH =
+    private static final Meal USER_MEAL_01_30_2020_LAUNCH =
             new Meal(100004, LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000);
-    public static Meal USER_MEAL_01_30_2020_DINNER =
+    private static final Meal USER_MEAL_01_30_2020_DINNER =
             new Meal(100005, LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500);
-    public static Meal USER_MEAL_01_31_2020_BORDER =
+    private static final Meal USER_MEAL_01_31_2020_BORDER =
             new Meal(100006, LocalDateTime.of(2020, Month.JANUARY, 31, 0, 0), "Еда на граничное значение", 100);
-    public static Meal USER_MEAL_01_31_2020_BREAKFAST =
+    private static final Meal USER_MEAL_01_31_2020_BREAKFAST =
             new Meal(100007, LocalDateTime.of(2020, Month.JANUARY, 31, 10, 0), "Завтрак", 1000);
-    public static Meal USER_MEAL_01_31_2020_LAUNCH =
+    private static final Meal USER_MEAL_01_31_2020_LAUNCH =
             new Meal(100008, LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500);
-    public static Meal USER_MEAL_01_31_2020_DINNER =
+    private static final Meal USER_MEAL_01_31_2020_DINNER =
             new Meal(100009, LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410);
 
     public static final List<Meal> USER_MEALS = Arrays.asList(
