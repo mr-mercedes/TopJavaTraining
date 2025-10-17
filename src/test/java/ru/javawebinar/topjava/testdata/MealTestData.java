@@ -49,9 +49,9 @@ public class MealTestData {
             USER_MEAL_01_31_2020_DINNER, USER_MEAL_01_31_2020_LAUNCH, USER_MEAL_01_31_2020_BREAKFAST, USER_MEAL_01_31_2020_BORDER
     );
 
-    public static Meal ADMIN_MEAL_06_01_2025_LAUNCH =
+    private static final Meal ADMIN_MEAL_06_01_2025_LAUNCH =
             new Meal(100010, LocalDateTime.of(2025, Month.JUNE, 1, 14, 0), "Админ ланч", 510);
-    public static Meal ADMIN_MEAL_06_01_2025_DINNER =
+    private static final Meal ADMIN_MEAL_06_01_2025_DINNER =
             new Meal(100011, LocalDateTime.of(2025, Month.JUNE, 1, 21, 0), "Админ ужин", 1500);
 
     public static final List<Meal> ADMIN_MEALS = Arrays.asList(
