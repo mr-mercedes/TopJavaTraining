@@ -16,10 +16,11 @@ import java.util.List;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.testdata.MealTestData.*;
+import static ru.javawebinar.topjava.testdata.UserTestData.ADMIN_ID;
+import static ru.javawebinar.topjava.testdata.UserTestData.USER_ID;
 
 @ContextConfiguration({
-        "classpath:spring/spring-jdbc.xml",
-        "classpath:spring/spring-db.xml"
+        "classpath:spring/spring-jdbc.xml"
 })
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -53,7 +54,7 @@ public class MealServiceTest {
     public void update() {
         Meal updated = getUpdated();
         service.update(updated, USER_ID);
-        assertMatch(updated, service.get(updated.getId(), USER_ID));
+        assertMatch(getUpdated(), service.get(updated.getId(), USER_ID));
     }
 
     @Test
@@ -70,9 +71,15 @@ public class MealServiceTest {
     }
 
     @Test
+    public void updateAnotherUserMeal() {
+        Meal updated = getUpdated();
+        assertThrows(NotFoundException.class, () -> service.update(updated, ADMIN_ID));
+    }
+
+    @Test
     public void get() {
         Meal meal = service.get(MEAL_ID, USER_ID);
-        assertMatch(meal, USER_MEAL_STANDARD);
+        assertMatch(meal, userMealStandard);
     }
 
     @Test
@@ -83,6 +90,11 @@ public class MealServiceTest {
     @Test
     public void getNotFoundUser() {
         assertThrows(NotFoundException.class, () -> service.get(MEAL_ID, NOT_FOUND_ID));
+    }
+
+    @Test
+    public void getAnotherUser() {
+        assertThrows(NotFoundException.class, () -> service.get(MEAL_ID, ADMIN_ID));
     }
 
     @Test
@@ -99,6 +111,11 @@ public class MealServiceTest {
     @Test
     public void deleteNotFoundUser() {
         assertThrows(NotFoundException.class, () -> service.delete(MEAL_ID, NOT_FOUND_ID));
+    }
+
+    @Test
+    public void deleteAnotherUserMeal() {
+        assertThrows(NotFoundException.class, () -> service.delete(MEAL_ID, ADMIN_ID));
     }
 
     @Test

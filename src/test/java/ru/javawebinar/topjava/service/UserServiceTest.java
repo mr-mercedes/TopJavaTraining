@@ -20,8 +20,7 @@ import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.testdata.UserTestData.*;
 
 @ContextConfiguration({
-        "classpath:spring/spring-jdbc.xml",
-        "classpath:spring/spring-db.xml"
+        "classpath:spring/spring-jdbc.xml"
 })
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
