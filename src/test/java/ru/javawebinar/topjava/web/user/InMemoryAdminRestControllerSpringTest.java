@@ -13,7 +13,10 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import static ru.javawebinar.topjava.testdata.UserTestData.NOT_FOUND;
 import static ru.javawebinar.topjava.testdata.UserTestData.USER_ID;
 
-@ContextConfiguration("classpath:spring/spring-in-memory.xml")
+@ContextConfiguration({
+        "classpath:spring/spring-app.xml",
+        "classpath:spring/spring-in-memory.xml"
+})
 @RunWith(SpringRunner.class)
 public class InMemoryAdminRestControllerSpringTest {
 

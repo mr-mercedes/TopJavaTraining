@@ -20,6 +20,7 @@ import static ru.javawebinar.topjava.testdata.UserTestData.ADMIN_ID;
 import static ru.javawebinar.topjava.testdata.UserTestData.USER_ID;
 
 @ContextConfiguration({
+        "classpath:spring/spring-app.xml",
         "classpath:spring/spring-jdbc.xml"
 })
 @RunWith(SpringRunner.class)
@@ -79,7 +80,7 @@ public class MealServiceTest {
     @Test
     public void get() {
         Meal meal = service.get(MEAL_ID, USER_ID);
-        assertMatch(meal, userMealStandard);
+        assertMatch(meal, USER_MEAL_STANDARD);
     }
 
     @Test
@@ -154,5 +155,4 @@ public class MealServiceTest {
         List<Meal> betweenInclusive = service.getBetweenInclusive(null, null, ADMIN_ID);
         assertMatch(betweenInclusive, ADMIN_MEALS);
     }
-
 }
