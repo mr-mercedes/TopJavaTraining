@@ -19,7 +19,7 @@ public class MealTestData {
     public static final int NOT_FOUND_ID = 404;
     public static final LocalDate START_DATE = LocalDate.of(2020, Month.JANUARY, 30);
     public static final LocalDate END_DATE = LocalDate.of(2020, Month.JANUARY, 31);
-    public static final Meal USER_MEAL_STANDARD =
+    public static final Meal userMealStandard =
             new Meal(100003, LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500);
 
     private static final LocalDateTime updatedDateTime =
@@ -42,16 +42,16 @@ public class MealTestData {
     private static final Meal adminMealDinner =
             new Meal(100011, LocalDateTime.of(2025, Month.JUNE, 1, 21, 0), "Админ ужин", 1500);
 
-    public static final List<Meal> USER_MEALS = Collections.unmodifiableList(Arrays.asList(
+    public static final List<Meal> userMeals = Collections.unmodifiableList(Arrays.asList(
             userMealDinner31, userMealLaunch31, userMealBreakfast31,
-            userMealBorder30, userMealDinner30, userMealLaunch30, USER_MEAL_STANDARD
+            userMealBorder30, userMealDinner30, userMealLaunch30, userMealStandard
     ));
 
-    public static final List<Meal> FILTERED_MEALS = Collections.unmodifiableList(Arrays.asList(
+    public static final List<Meal> filteredMeals = Collections.unmodifiableList(Arrays.asList(
             userMealDinner31, userMealLaunch31, userMealBreakfast31, userMealBorder30
     ));
 
-    public static final List<Meal> ADMIN_MEALS = Collections.unmodifiableList(Arrays.asList(
+    public static final List<Meal> adminMeals = Collections.unmodifiableList(Arrays.asList(
             adminMealDinner, adminMealLaunch
     ));
 
@@ -64,7 +64,7 @@ public class MealTestData {
     }
 
     public static Meal getUpdated() {
-        Meal updated = new Meal(USER_MEAL_STANDARD);
+        Meal updated = new Meal(userMealStandard);
         updated.setDateTime(updatedDateTime);
         updated.setDescription(updatedDescription);
         updated.setCalories(30);
