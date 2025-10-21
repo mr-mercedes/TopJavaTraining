@@ -1,7 +1,6 @@
 package ru.javawebinar.topjava.service;
 
 import org.junit.Test;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import ru.javawebinar.topjava.model.Meal;
@@ -15,10 +14,6 @@ import static ru.javawebinar.topjava.testdata.UserTestData.ADMIN_ID;
 import static ru.javawebinar.topjava.testdata.UserTestData.USER_ID;
 
 public class MealServiceTest extends BaseTest {
-
-    static {
-        SLF4JBridgeHandler.install();
-    }
 
     @Autowired
     private MealService service;

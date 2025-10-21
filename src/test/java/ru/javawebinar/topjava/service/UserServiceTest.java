@@ -1,7 +1,6 @@
 package ru.javawebinar.topjava.service;
 
 import org.junit.Test;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import ru.javawebinar.topjava.model.Role;
@@ -15,10 +14,6 @@ import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.testdata.UserTestData.*;
 
 public class UserServiceTest extends BaseTest {
-
-    static {
-        SLF4JBridgeHandler.install();
-    }
 
     @Autowired
     private UserService service;
