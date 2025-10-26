@@ -34,14 +34,6 @@ public abstract class BaseTest {
     private static final int offsetPosition = title.length();
     private static String currentTestClass;
 
-    private static String getFormatPattern(int methodNameLength) {
-        int delimiterLength = 3;
-        int baseOffset = offsetPosition - methodNameLength;
-        int resultLength = String.valueOf((baseOffset)).length();
-        int offset = baseOffset - String.valueOf((resultLength)).length() - delimiterLength;
-        return "%s : % " + offset + "d ms";
-    }
-
     @Rule
     public final TestRule stopWatch = new Stopwatch() {
 
@@ -59,6 +51,11 @@ public abstract class BaseTest {
     @ClassRule
     public static final ExternalResource summary = new ExternalResource() {
         @Override
+        protected void before() {
+            times.clear();
+        }
+
+        @Override
         protected void after() {
             String logs = times.entrySet().stream()
                     .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
@@ -70,4 +67,12 @@ public abstract class BaseTest {
             log.info("{}Class: {}\n{}", title, currentTestClass, logs);
         }
     };
+
+    private static String getFormatPattern(int methodNameLength) {
+        int delimiterLength = 3;
+        int baseOffset = offsetPosition - methodNameLength;
+        int resultLength = String.valueOf((baseOffset)).length();
+        int offset = baseOffset - String.valueOf((resultLength)).length() - delimiterLength;
+        return "%s : % " + offset + "d ms";
+    }
 }
