@@ -8,15 +8,17 @@ import org.junit.rules.Stopwatch;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @ContextConfiguration({
         "classpath:spring/spring-app.xml",
@@ -26,10 +28,11 @@ import java.util.logging.Logger;
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public abstract class BaseTest {
 
-    private static final Logger LOG = Logger.getLogger(BaseTest.class.getName());
-    private final static Map<String, Long> TIMES = new ConcurrentHashMap<>();
-    private static String currentTestClass = null;
-
+    private static final Logger log = LoggerFactory.getLogger(BaseTest.class);
+    private static final Map<String, Long> times = new HashMap<>();
+    private static final String title = "\n========= TEST TIME SUMMARY (ms) =========\n";
+    private static final int offsetPosition = title.length();
+    private static String currentTestClass;
 
     @Rule
     public final TestRule stopWatch = new Stopwatch() {
@@ -40,18 +43,21 @@ public abstract class BaseTest {
             String method = description.getMethodName();
             currentTestClass = description.getTestClass().getSimpleName();
             String className = String.format("%s#%s", currentTestClass, method);
-            TIMES.put(method, ms);
-            LOG.info(String.format("TEST %-5s : %6d ms", className, ms));
+            times.put(method, ms);
+            log.info(String.format("\nTEST " + getFormatPattern(className.length()), className, ms));
         }
     };
 
+    private static String getFormatPattern(int methodNameLength) {
+        int delimiterLength = 3;
+        int baseOffset = offsetPosition - methodNameLength;
+        int resultLength = String.valueOf((baseOffset)).length();
+        int offset = baseOffset - String.valueOf((resultLength)).length() - delimiterLength;
+        return "%s : % " + offset + "d";
+    }
+
     @ClassRule
     public static final ExternalResource summary = new ExternalResource() {
-
-        @Override
-        protected void before() {
-            TIMES.clear();
-        }
 
         @Override
         protected void after() {
@@ -59,17 +65,14 @@ public abstract class BaseTest {
                 currentTestClass = "UnknownTestClass";
             }
 
-            LOG.info("========= TEST TIME SUMMARY (ms) =========");
-            LOG.info("Class: " + currentTestClass);
-            TIMES.entrySet().stream()
+            String logs = times.entrySet().stream()
                     .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-                    .forEach(e -> LOG.info(String.format("%-5s : %6d", e.getKey(), e.getValue())));
-
-            long total = TIMES.values().stream().mapToLong(Long::longValue).sum();
-            double avg = TIMES.isEmpty() ? 0.0 : (total * 1.0 / TIMES.size());
-            LOG.info("------------------------------------------");
-            LOG.info(String.format("TOTAL: %d ms,  AVERAGE: %.1f ms", total, avg));
-            LOG.info("==========================================");
+                    .map(e -> {
+                        String format = getFormatPattern(e.getKey().length());
+                        return String.format(format, e.getKey(), e.getValue());
+                    })
+                    .collect(Collectors.joining("\n"));
+            log.info("{}Class: {}\n{}", title, currentTestClass, logs);
         }
     };
 }

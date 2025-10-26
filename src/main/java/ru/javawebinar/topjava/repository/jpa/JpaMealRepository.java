@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.repository.jpa;
 
-import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
@@ -22,20 +21,24 @@ public class JpaMealRepository implements MealRepository {
     @Override
     @Transactional
     public Meal save(Meal meal, int userId) {
+        meal.setUser(em.getReference(User.class, userId));
         if (meal.isNew()) {
-            meal.setUser(em.getReference(User.class, userId));
             em.persist(meal);
             return meal;
         } else {
-            int updated = em.createNamedQuery(Meal.UPDATE)
-                    .setParameter("dt", meal.getDateTime())
-                    .setParameter("description", meal.getDescription())
-                    .setParameter("calories", meal.getCalories())
-                    .setParameter("id", meal.getId())
-                    .setParameter("userId", userId)
-                    .executeUpdate();
-            return updated == 0 ? null : meal;
+            if (!isOwner(meal.getId(), userId)) {
+                return null;
+            }
+            return em.merge(meal);
         }
+    }
+
+    private boolean isOwner(int mealId, int userId) {
+        return !em.createNamedQuery(Meal.EXISTS)
+                .setParameter("id", mealId)
+                .setParameter("userId", userId)
+                .getResultList()
+                .isEmpty();
     }
 
     @Override
@@ -49,11 +52,11 @@ public class JpaMealRepository implements MealRepository {
 
     @Override
     public Meal get(int id, int userId) {
-        List<Meal> results = em.createNamedQuery(Meal.GET, Meal.class)
-                .setParameter("id", id)
-                .setParameter("userId", userId)
-                .getResultList();
-        return DataAccessUtils.singleResult(results);
+        Meal meal = em.find(Meal.class, id);
+        if (meal == null || meal.getUser().getId() != userId) {
+            return null;
+        }
+        return meal;
     }
 
     @Override
