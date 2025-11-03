@@ -124,4 +124,14 @@ public abstract class JdbcMealRepositoryTemplate implements MealRepository {
                 Timestamp.valueOf(start),
                 Timestamp.valueOf(end));
     }
+
+    @Override
+    public Meal getWithUser(int id, int userId) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public List<Meal> getAllWithUser(int userId) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

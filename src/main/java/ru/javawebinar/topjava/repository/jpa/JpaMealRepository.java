@@ -59,4 +59,14 @@ public class JpaMealRepository implements MealRepository {
                 .setParameter("endDateTime", endDateTime)
                 .getResultList();
     }
+
+    @Override
+    public Meal getWithUser(int id, int userId) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public List<Meal> getAllWithUser(int userId) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
