@@ -5,6 +5,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.to.MealTo;
+import ru.javawebinar.topjava.web.MealServlet;
 import ru.javawebinar.topjava.web.meal.MealRestController;
 import ru.javawebinar.topjava.web.user.AdminRestController;
 
@@ -31,6 +32,9 @@ public class SpringMain {
             filteredMealsWithExcess.forEach(System.out::println);
             System.out.println();
             System.out.println(mealController.getBetween(null, null, null, null));
+
+            MealServlet mealServlet = new MealServlet();
+            mealServlet.init();
         }
     }
 }
