@@ -5,11 +5,16 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.MealRepository;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public class DataJpaMealRepository implements MealRepository {
+
+    @PersistenceContext
+    private EntityManager em;
 
     private final CrudMealRepository crudRepository;
 
@@ -19,19 +24,13 @@ public class DataJpaMealRepository implements MealRepository {
 
     @Override
     public Meal save(Meal meal, int userId) {
-        meal.setUser(getUserReference(userId));
+        meal.setUser(em.getReference(User.class, userId));
         if (meal.isNew()) {
             return crudRepository.save(meal);
         }
         return crudRepository.findByIdAndUser_Id(meal.id(), userId)
-                .map((m) -> crudRepository.save(meal))
+                .map(m -> crudRepository.save(meal))
                 .orElse(null);
-    }
-
-    private User getUserReference(int userId) {
-        User reference = new User();
-        reference.setId(userId);
-        return reference;
     }
 
     @Override
@@ -47,11 +46,6 @@ public class DataJpaMealRepository implements MealRepository {
     @Override
     public Meal getWithUser(int id, int userId) {
         return crudRepository.findByIdAndUserIdWithUser(id, userId).orElse(null);
-    }
-
-    @Override
-    public List<Meal> getAllWithUser(int userId) {
-        return crudRepository.getAllByUserId(userId);
     }
 
     @Override

@@ -30,10 +30,6 @@ public class MealService {
         return checkNotFound(repository.getWithUser(id, userId), id);
     }
 
-    public List<Meal> getAllWithUser(int userId) {
-        return repository.getAllWithUser(userId);
-    }
-
     public void delete(int id, int userId) {
         checkNotFound(repository.delete(id, userId), id);
     }
