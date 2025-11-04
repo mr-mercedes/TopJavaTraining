@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.Profiles;
 
+import java.time.LocalDateTime;
+
 
 @Repository
 @Profile(Profiles.POSTGRES_DB)
@@ -23,5 +25,10 @@ public class PostgresJdbcMealRepository extends JdbcMealRepositoryTemplate {
                 .withSchemaName("public")
                 .withTableName(tableName())
                 .usingGeneratedKeyColumns(idColumn());
+    }
+
+    @Override
+    protected Object dateTimeToDb(LocalDateTime ldt) {
+        return ldt;
     }
 }

@@ -33,9 +33,9 @@ public interface CrudMealRepository extends JpaRepository<Meal, Integer> {
 
     @Query("SELECT m FROM Meal m " +
             "JOIN FETCH m.user u " +
-            "WHERE u.id=:userId " +
-            "AND m.id=:id")
-    Optional<Meal> findByIdAndUserIdWithUser(@Param("id") int id, @Param("userId") int userId);
+            "WHERE m.id=:id " +
+            "AND u.id=:userId ")
+    Optional<Meal> findByIdWithUser(@Param("id") int id, @Param("userId") int userId);
 
     Optional<Meal> findByIdAndUser_Id(int id, int userId);
 
