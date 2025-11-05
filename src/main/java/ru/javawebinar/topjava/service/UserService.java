@@ -5,7 +5,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.repository.UserRepository;
@@ -41,9 +40,10 @@ public class UserService {
     }
 
     @Transactional
-    public List<Meal> getByIdWithMeals(int id) {
+    public User getByIdWithMeals(int id) {
         User user = get(id);
-        return mealRepository.getAll(user.getId());
+        user.setMeals(mealRepository.getAll(user.getId()));
+        return user;
     }
 
     public User getByEmail(String email) {

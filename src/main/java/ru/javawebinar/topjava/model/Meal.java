@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import static ru.javawebinar.topjava.model.Meal.MEAL_FIELD;
+
 @NamedQueries({
         @NamedQuery(name = Meal.ALL_SORTED, query = "SELECT m FROM Meal m WHERE m.user.id=:userId ORDER BY m.dateTime DESC"),
         @NamedQuery(name = Meal.DELETE, query = "DELETE FROM Meal m WHERE m.id=:id AND m.user.id=:userId"),
@@ -21,27 +23,34 @@ import java.time.LocalTime;
 //                "m.description=:desc where m.id=:id and m.user.id=:userId")
 })
 @Entity
-@Table(name = "meal", uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "date_time"}, name = "meal_unique_user_datetime_idx")})
+@Table(name = MEAL_FIELD, uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "date_time"}, name = "meal_unique_user_datetime_idx")})
 public class Meal extends AbstractBaseEntity {
+
+    public static final String MEAL_FIELD = "meal";
+    public static final String USER_ID_FIELD = "user_id";
+    public static final String DATE_TIME_FIELD = "date_time";
+    public static final String DESCRIPTION_FIELD = "description";
+    public static final String CALORIES_FIELD = "calories";
+
     public static final String ALL_SORTED = "Meal.getAll";
     public static final String DELETE = "Meal.delete";
     public static final String GET_BETWEEN = "Meal.getBetween";
 
-    @Column(name = "date_time", nullable = false)
+    @Column(name = DATE_TIME_FIELD, nullable = false)
     @NotNull
     private LocalDateTime dateTime;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = DESCRIPTION_FIELD, nullable = false)
     @NotBlank
     @Size(min = 2, max = 120)
     private String description;
 
-    @Column(name = "calories", nullable = false)
+    @Column(name = CALORIES_FIELD, nullable = false)
     @Range(min = 10, max = 5000)
     private int calories;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = USER_ID_FIELD, nullable = false)
     @NotNull
     private User user;
 

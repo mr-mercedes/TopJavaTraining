@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 public interface CrudMealRepository extends JpaRepository<Meal, Integer> {
 
     @Transactional
@@ -37,7 +37,9 @@ public interface CrudMealRepository extends JpaRepository<Meal, Integer> {
             "AND u.id=:userId ")
     Optional<Meal> findByIdWithUser(@Param("id") int id, @Param("userId") int userId);
 
-    Optional<Meal> findByIdAndUser_Id(int id, int userId);
+    @Query("SELECT m FROM Meal m WHERE m.user.id=:userId AND m.id=:id")
+    Optional<Meal> findByIdAndUserId(@Param("id") int id, @Param("userId") int userId);
 
-    List<Meal> findAllByUser_IdOrderByDateTimeDesc(int userId);
+    @Query("SELECT m FROM Meal m WHERE m.user.id=:userId ORDER BY m.dateTime DESC")
+    List<Meal> findAllByUserId(@Param("userId") int userId);
 }

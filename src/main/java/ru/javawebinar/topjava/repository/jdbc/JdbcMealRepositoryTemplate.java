@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import ru.javawebinar.topjava.model.AbstractBaseEntity;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 
@@ -27,19 +28,19 @@ public abstract class JdbcMealRepositoryTemplate implements MealRepository {
     }
 
     protected String tableName() {
-        return "meal";
+        return Meal.MEAL_FIELD;
     }
 
     protected String idColumn() {
-        return "id";
+        return AbstractBaseEntity.ID_FIELD;
     }
 
     protected String userIdColumn() {
-        return "user_id";
+        return Meal.USER_ID_FIELD;
     }
 
     protected String dateTimeColumn() {
-        return "date_time";
+        return Meal.DATE_TIME_FIELD;
     }
 
     protected SimpleJdbcInsert buildInsert(JdbcTemplate jdbcTemplate) {
@@ -53,7 +54,7 @@ public abstract class JdbcMealRepositoryTemplate implements MealRepository {
     }
 
     protected Object dateTimeToDb(LocalDateTime ldt) {
-        return Timestamp.valueOf(ldt);
+        throw new RuntimeException("method not implemented yet");
     }
 
     protected LocalDateTime dateTimeFromDb(Timestamp ts) {
@@ -64,8 +65,8 @@ public abstract class JdbcMealRepositoryTemplate implements MealRepository {
         return (resultSet, __) -> {
             Meal meal = new Meal();
             meal.setId(resultSet.getInt(query(idColumn())));
-            meal.setDescription(resultSet.getString("description"));
-            meal.setCalories(resultSet.getInt("calories"));
+            meal.setDescription(resultSet.getString(Meal.DESCRIPTION_FIELD));
+            meal.setCalories(resultSet.getInt(Meal.CALORIES_FIELD));
             Timestamp ts = resultSet.getTimestamp(query(dateTimeColumn()));
             meal.setDateTime(dateTimeFromDb(ts));
             return meal;
@@ -76,8 +77,8 @@ public abstract class JdbcMealRepositoryTemplate implements MealRepository {
     public final Meal save(Meal meal, int userId) {
         MapSqlParameterSource map = new MapSqlParameterSource()
                 .addValue(idColumn(), meal.getId())
-                .addValue("description", meal.getDescription())
-                .addValue("calories", meal.getCalories())
+                .addValue(Meal.DESCRIPTION_FIELD, meal.getDescription())
+                .addValue(Meal.CALORIES_FIELD, meal.getCalories())
                 .addValue(dateTimeColumn(), dateTimeToDb(meal.getDateTime()))
                 .addValue(userIdColumn(), userId);
 

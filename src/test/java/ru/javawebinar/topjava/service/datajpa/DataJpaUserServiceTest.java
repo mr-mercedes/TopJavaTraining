@@ -4,13 +4,12 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import ru.javawebinar.topjava.Profiles;
-import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.AbstractUserServiceTest;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.service.UserService;
 
 import java.util.Collections;
-import java.util.List;
 
 import static ru.javawebinar.topjava.MealTestData.MEAL_MATCHER;
 import static ru.javawebinar.topjava.UserTestData.GUEST_ID;
@@ -27,13 +26,13 @@ public class DataJpaUserServiceTest extends AbstractUserServiceTest {
 
     @Test
     public void getByIdWithMeals() {
-        List<Meal> meals = service.getByIdWithMeals(USER_ID);
-        MEAL_MATCHER.assertMatch(meals, mealService.getAll(USER_ID));
+        User userWithMeals = service.getByIdWithMeals(USER_ID);
+        MEAL_MATCHER.assertMatch(userWithMeals.getMeals(), mealService.getAll(USER_ID));
     }
 
     @Test
     public void getByIdWithoutMeals() {
-        List<Meal> meals = service.getByIdWithMeals(GUEST_ID);
-        MEAL_MATCHER.assertMatch(meals, Collections.emptyList());
+        User guessWithMeals = service.getByIdWithMeals(GUEST_ID);
+        MEAL_MATCHER.assertMatch(guessWithMeals.getMeals(), Collections.emptyList());
     }
 }
