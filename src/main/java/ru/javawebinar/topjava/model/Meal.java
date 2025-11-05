@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-import static ru.javawebinar.topjava.model.Meal.MEAL_FIELD;
+import static ru.javawebinar.topjava.model.Meal.*;
 
 @NamedQueries({
         @NamedQuery(name = Meal.ALL_SORTED, query = "SELECT m FROM Meal m WHERE m.user.id=:userId ORDER BY m.dateTime DESC"),
@@ -23,7 +23,7 @@ import static ru.javawebinar.topjava.model.Meal.MEAL_FIELD;
 //                "m.description=:desc where m.id=:id and m.user.id=:userId")
 })
 @Entity
-@Table(name = MEAL_FIELD, uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "date_time"}, name = "meal_unique_user_datetime_idx")})
+@Table(name = MEAL_FIELD, uniqueConstraints = {@UniqueConstraint(columnNames = {USER_ID_FIELD, DATE_TIME_FIELD}, name = "meal_unique_user_datetime_idx")})
 public class Meal extends AbstractBaseEntity {
 
     public static final String MEAL_FIELD = "meal";

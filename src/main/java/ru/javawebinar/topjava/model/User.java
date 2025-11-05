@@ -43,7 +43,7 @@ public class User extends AbstractNamedEntity {
     @NotNull
     private Date registered = new Date();
 
-    @Transient
+    @OneToMany(mappedBy = "user")
     private List<Meal> meals = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)

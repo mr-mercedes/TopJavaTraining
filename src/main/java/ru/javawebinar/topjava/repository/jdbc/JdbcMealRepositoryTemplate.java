@@ -53,9 +53,7 @@ public abstract class JdbcMealRepositoryTemplate implements MealRepository {
         return id;
     }
 
-    protected Object dateTimeToDb(LocalDateTime ldt) {
-        throw new RuntimeException("method not implemented yet");
-    }
+    protected abstract <T> T dateTimeToDb(LocalDateTime ldt);
 
     protected LocalDateTime dateTimeFromDb(Timestamp ts) {
         return ts.toLocalDateTime();

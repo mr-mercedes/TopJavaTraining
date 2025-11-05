@@ -19,6 +19,7 @@ public class HsqlJdbcMealRepository extends JdbcMealRepositoryTemplate {
         super(jdbcTemplate, namedParameterJdbcTemplate);
     }
 
+    @Override
     protected Timestamp dateTimeToDb(LocalDateTime ldt) {
         return Timestamp.valueOf(ldt);
     }
