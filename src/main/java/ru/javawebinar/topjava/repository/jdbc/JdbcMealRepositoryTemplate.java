@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public abstract class JdbcMealRepositoryTemplate implements MealRepository {
+public abstract class JdbcMealRepositoryTemplate<T> implements MealRepository {
 
     protected final JdbcTemplate jdbcTemplate;
     protected final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -53,7 +53,7 @@ public abstract class JdbcMealRepositoryTemplate implements MealRepository {
         return id;
     }
 
-    protected abstract <T> T dateTimeToDb(LocalDateTime ldt);
+    protected abstract T dateTimeToDb(LocalDateTime ldt);
 
     protected LocalDateTime dateTimeFromDb(Timestamp ts) {
         return ts.toLocalDateTime();
@@ -120,7 +120,7 @@ public abstract class JdbcMealRepositoryTemplate implements MealRepository {
                 " WHERE " + query(userIdColumn()) + "=? AND " + query(dateTimeColumn()) + " >= ? AND " + query(dateTimeColumn()) + " < ?" +
                 " ORDER BY " + query(dateTimeColumn()) + " DESC";
         return jdbcTemplate.query(sql, rowMapper(), userId,
-                Timestamp.valueOf(start),
-                Timestamp.valueOf(end));
+                dateTimeToDb(start),
+                dateTimeToDb(end));
     }
 }
