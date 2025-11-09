@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
+import ru.javawebinar.topjava.util.JdbcEntityValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +21,8 @@ import java.util.List;
 public class JdbcMealRepository implements MealRepository {
 
     private static final RowMapper<Meal> ROW_MAPPER = BeanPropertyRowMapper.newInstance(Meal.class);
+
+    private static final JdbcEntityValidator VALIDATOR = new JdbcEntityValidator();
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -39,6 +42,7 @@ public class JdbcMealRepository implements MealRepository {
     @Override
     @Transactional
     public Meal save(Meal meal, int userId) {
+        VALIDATOR.validateOrThrow(meal);
         MapSqlParameterSource map = new MapSqlParameterSource()
                 .addValue("id", meal.getId())
                 .addValue("description", meal.getDescription())
