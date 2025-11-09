@@ -1,0 +1,16 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+       profile="!jdbc">
+
+    <bean class="org.springframework.beans.factory.config.PropertyOverrideConfigurer">
+        <property name="properties">
+            <props>
+                <prop key="entityManagerFactory.jpaPropertyMap[hibernate.cache.use_second_level_cache]">false</prop>
+                <prop key="entityManagerFactory.jpaPropertyMap[hibernate.cache.use_query_cache]">false</prop>
+                <prop key="entityManagerFactory.jpaPropertyMap[javax.persistence.sharedCache.mode]">NONE</prop>
+            </props>
+        </property>
+    </bean>
+</beans>
