@@ -5,6 +5,6 @@
          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
          http://www.springframework.org/schema/cache https://www.springframework.org/schema/cache/spring-cache.xsd">
 
-    <cache:annotation-driven/>
-    <bean id="cacheManager" class="org.springframework.cache.support.NoOpCacheManager"/>
+    <cache:annotation-driven cache-manager="ehCacheManager"/>
+    <bean id="ehCacheManager" class="org.springframework.cache.support.NoOpCacheManager"/>
 </beans>

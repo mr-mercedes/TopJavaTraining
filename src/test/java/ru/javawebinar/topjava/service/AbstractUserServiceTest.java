@@ -28,6 +28,14 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     private CacheManager cacheManager;
 
     @Test
+    public void springCacheInAction() {
+        List<User> before = service.getAll();
+        service.delete(USER_ID);
+        List<User> after = service.getAll();
+        assertThat(before.size()).isGreaterThan(after.size());
+    }
+
+    @Test
     public void cacheManagerIsNoOp() {
         assertThat(cacheManager).isInstanceOf(NoOpCacheManager.class);
     }
@@ -90,7 +98,7 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    public void createWithException() throws Exception {
+    public void createWithException() {
         validateRootCause(ConstraintViolationException.class, () -> service.create(new User(null, "  ", "mail@yandex.ru", "password", Role.USER)));
         validateRootCause(ConstraintViolationException.class, () -> service.create(new User(null, "User", "  ", "password", Role.USER)));
         validateRootCause(ConstraintViolationException.class, () -> service.create(new User(null, "User", "mail@yandex.ru", "  ", Role.USER)));
