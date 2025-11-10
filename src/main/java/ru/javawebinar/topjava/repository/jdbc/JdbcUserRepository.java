@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
-import ru.javawebinar.topjava.util.JdbcEntityValidator;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,7 +22,7 @@ import java.util.*;
 @Transactional(readOnly = true)
 public class JdbcUserRepository implements UserRepository {
 
-    private static final JdbcEntityValidator VALIDATOR = new JdbcEntityValidator();
+    private final JdbcEntityValidator jdbcEntityValidator;
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -32,19 +31,24 @@ public class JdbcUserRepository implements UserRepository {
     private final SimpleJdbcInsert insertUser;
 
     @Autowired
-    public JdbcUserRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public JdbcUserRepository(
+            JdbcTemplate jdbcTemplate,
+            NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+            JdbcEntityValidator jdbcEntityValidator
+    ) {
         this.insertUser = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("id");
 
         this.jdbcTemplate = jdbcTemplate;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+        this.jdbcEntityValidator = jdbcEntityValidator;
     }
 
     @Override
     @Transactional
     public User save(User user) {
-        VALIDATOR.validateOrThrow(user);
+        jdbcEntityValidator.validateOrThrow(user);
         BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
 
         if (user.isNew()) {
