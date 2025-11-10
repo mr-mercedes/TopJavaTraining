@@ -22,14 +22,14 @@ import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalTime;
 public class JspMealController extends AbstractMealController {
 
     @GetMapping
-    public String meals(Model model) {
+    public String getAll(Model model) {
         log.info("meals");
         model.addAttribute("meals", getAll());
         return "meals";
     }
 
     @GetMapping("/filter")
-    public String getFilteredMeals(HttpServletRequest request, Model model) {
+    public String getFiltered(HttpServletRequest request, Model model) {
         log.info("filtering meals");
         LocalDate startDate = parseLocalDate(request.getParameter("startDate"));
         LocalDate endDate = parseLocalDate(request.getParameter("endDate"));
@@ -58,14 +58,14 @@ public class JspMealController extends AbstractMealController {
     }
 
     @PostMapping()
-    public String createMeal(HttpServletRequest request, Model model) {
+    public String create(HttpServletRequest request, Model model) {
         log.info("create meals");
-        final Meal meal = getMealFromRequest(request);
+        final Meal meal = getFromRequest(request);
         model.addAttribute("meal", create(meal));
         return "redirect:/meals";
     }
 
-    private Meal getMealFromRequest(HttpServletRequest request) {
+    private Meal getFromRequest(HttpServletRequest request) {
         return new Meal(
                 LocalDateTime.parse(request.getParameter("dateTime")),
                 request.getParameter("description"),
@@ -73,17 +73,17 @@ public class JspMealController extends AbstractMealController {
     }
 
     @PostMapping(value = "/{id}")
-    public String updateMeal(@PathVariable Integer id, HttpServletRequest request) {
+    public String update(@PathVariable Integer id, HttpServletRequest request) {
         log.info("update meals");
-        final Meal meal = getMealFromRequest(request);
+        final Meal meal = getFromRequest(request);
         update(meal, id);
         return "redirect:/meals";
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteMeal(@PathVariable Integer id) {
+    public String delete(@PathVariable Integer id) {
         log.info("delete meals");
-        delete(id);
+        super.delete(id);
         return "redirect:/meals";
     }
 }
