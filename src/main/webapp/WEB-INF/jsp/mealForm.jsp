@@ -12,7 +12,7 @@
     <spring:message code="meal.edit" var="editMsg"/>
     <h2>${id == null ? createMsg : editMsg}</h2>
     <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
-    <form method="post" action="${pageContext.request.contextPath}/meals/${meal.id}">
+    <form method="post" action="meals/${meal.id}">
         <dl>
             <dt>DateTime:</dt>
             <dd><input type="datetime-local" value="${meal.dateTime}" name="dateTime" required></dd>
