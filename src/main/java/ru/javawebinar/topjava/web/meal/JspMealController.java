@@ -57,19 +57,19 @@ public class JspMealController extends AbstractMealController {
         return "/mealForm";
     }
 
+    @GetMapping("/delete/{id}")
+    public String delete(@PathVariable Integer id) {
+        log.info("delete meals");
+        super.delete(id);
+        return "redirect:/meals";
+    }
+
     @PostMapping()
     public String create(HttpServletRequest request, Model model) {
         log.info("create meals");
         final Meal meal = getFromRequest(request);
         model.addAttribute("meal", create(meal));
         return "redirect:/meals";
-    }
-
-    private Meal getFromRequest(HttpServletRequest request) {
-        return new Meal(
-                LocalDateTime.parse(request.getParameter("dateTime")),
-                request.getParameter("description"),
-                Integer.parseInt(request.getParameter("calories")));
     }
 
     @PostMapping(value = "/{id}")
@@ -80,10 +80,10 @@ public class JspMealController extends AbstractMealController {
         return "redirect:/meals";
     }
 
-    @GetMapping("/delete/{id}")
-    public String delete(@PathVariable Integer id) {
-        log.info("delete meals");
-        super.delete(id);
-        return "redirect:/meals";
+    private Meal getFromRequest(HttpServletRequest request) {
+        return new Meal(
+                LocalDateTime.parse(request.getParameter("dateTime")),
+                request.getParameter("description"),
+                Integer.parseInt(request.getParameter("calories")));
     }
 }

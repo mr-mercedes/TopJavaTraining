@@ -23,7 +23,7 @@ import java.util.*;
 @Transactional(readOnly = true)
 public class JdbcUserRepository implements UserRepository {
 
-    private static final ResultSetExtractor<List<User>> dataExtractor = (ResultSet rs) -> {
+    private static final ResultSetExtractor<List<User>> DATA_EXTRACTOR = (ResultSet rs) -> {
         Map<Integer, User> users = new LinkedHashMap<>();
         while (rs.next()) {
             int id = rs.getInt("id");
@@ -37,7 +37,7 @@ public class JdbcUserRepository implements UserRepository {
                 u.setEnabled(rs.getBoolean("enabled"));
                 u.setRegistered(rs.getTimestamp("registered"));
                 u.setCaloriesPerDay(rs.getInt("calories_per_day"));
-                u.setRoles(new HashSet<>());
+                u.setRoles(EnumSet.noneOf(Role.class));
                 users.put(id, u);
             }
             String roleStr = rs.getString("role");
@@ -166,7 +166,7 @@ public class JdbcUserRepository implements UserRepository {
                  WHERE id=?
                 """;
 
-        List<User> users = jdbcTemplate.query(sql, dataExtractor, id);
+        List<User> users = jdbcTemplate.query(sql, DATA_EXTRACTOR, id);
         return DataAccessUtils.singleResult(users);
     }
 
@@ -178,7 +178,7 @@ public class JdbcUserRepository implements UserRepository {
                  WHERE email=?
                 """;
 
-        List<User> users = jdbcTemplate.query(sql, dataExtractor, email);
+        List<User> users = jdbcTemplate.query(sql, DATA_EXTRACTOR, email);
         return DataAccessUtils.singleResult(users);
     }
 
@@ -190,6 +190,6 @@ public class JdbcUserRepository implements UserRepository {
                  ORDER BY u.email
                 """;
 
-        return jdbcTemplate.query(sql, dataExtractor);
+        return jdbcTemplate.query(sql, DATA_EXTRACTOR);
     }
 }
