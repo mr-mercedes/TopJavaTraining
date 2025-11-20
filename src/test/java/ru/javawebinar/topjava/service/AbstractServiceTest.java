@@ -16,6 +16,7 @@ import ru.javawebinar.topjava.ActiveDbProfileResolver;
 import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.TimingRules;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @ContextConfiguration({
@@ -30,21 +31,15 @@ public abstract class AbstractServiceTest {
     @ClassRule
     public static ExternalResource summary = TimingRules.SUMMARY;
 
-    @Autowired
-    private Environment env;
-
     @Rule
     public Stopwatch stopwatch = TimingRules.STOPWATCH;
-
-    public boolean isJpaBased() {
-//        return Arrays.stream(env.getActiveProfiles()).noneMatch(Profiles.JDBC::equals);
-        return env.acceptsProfiles(org.springframework.core.env.Profiles.of(Profiles.JPA, Profiles.DATAJPA));
-    }
 
     //  Check root cause with AssertJ: https://github.com/junit-team/junit-framework/issues/2129#issuecomment-565712630
     protected <T extends Throwable> void validateRootCause(Class<T> rootExceptionClass, Runnable runnable) {
         assertThatExceptionOfType(Throwable.class)
                 .isThrownBy(runnable::run)
-                .withRootCauseInstanceOf(rootExceptionClass);
+                .satisfiesAnyOf(
+                        ex -> assertThat(ex).isInstanceOf(rootExceptionClass),
+                        ex -> assertThat(ex).hasRootCauseInstanceOf(rootExceptionClass));
     }
 }
