@@ -17,16 +17,16 @@ import java.util.List;
 @RequestMapping(MealRestController.BASE_PATH)
 public class MealRestController extends AbstractMealController {
 
-    static final String BASE_PATH = "/rest/meals/";
+    static final String BASE_PATH = "/rest/meals";
 
     @Override
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public Meal get(@PathVariable int id) {
         return super.get(id);
     }
 
     @Override
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable int id) {
         super.delete(id);
@@ -49,7 +49,7 @@ public class MealRestController extends AbstractMealController {
 
     @Override
     @PutMapping(
-            value = "{id}",
+            value = "/{id}",
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -57,7 +57,7 @@ public class MealRestController extends AbstractMealController {
         super.update(meal, id);
     }
 
-    @GetMapping("between")
+    @GetMapping("/between")
     public List<MealTo> getBetweenFilter(
             @RequestParam(required = false) LocalDate startDate,
             @RequestParam(required = false) LocalTime startTime,

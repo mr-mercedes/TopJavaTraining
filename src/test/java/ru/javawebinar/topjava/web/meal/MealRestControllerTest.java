@@ -30,7 +30,7 @@ class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void get() throws Exception {
-        perform(MockMvcRequestBuilders.get(BASE_PATH + MEAL1_ID))
+        perform(MockMvcRequestBuilders.get(BASE_PATH + "/{id}", MEAL1_ID))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -53,7 +53,7 @@ class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void delete() throws Exception {
-        perform(MockMvcRequestBuilders.delete(BASE_PATH + MEAL1_ID))
+        perform(MockMvcRequestBuilders.delete(BASE_PATH + "/{id}", MEAL1_ID))
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
@@ -78,7 +78,7 @@ class MealRestControllerTest extends AbstractControllerTest {
     @Test
     void update() throws Exception {
         Meal updated = getUpdated();
-        perform(MockMvcRequestBuilders.put(BASE_PATH + MEAL1_ID)
+        perform(MockMvcRequestBuilders.put(BASE_PATH + "/{id}", MEAL1_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(updated)))
                 .andExpect(status().isNoContent());
@@ -88,7 +88,7 @@ class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void getBetween() throws Exception {
-        perform(MockMvcRequestBuilders.get(BASE_PATH + "between")
+        perform(MockMvcRequestBuilders.get(BASE_PATH + "/between")
                 .queryParam("startDate", "2020-01-30")
                 .queryParam("startTime", "10:00:10")
                 .queryParam("endDate", "2020-01-30")
