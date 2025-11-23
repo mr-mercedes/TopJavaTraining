@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping(MealRestController.BASE_PATH)
 public class MealRestController extends AbstractMealController {
 
-    static final String BASE_PATH = "/rest-meals/";
+    static final String BASE_PATH = "/rest/meals/";
 
     @Override
     @GetMapping("{id}")
