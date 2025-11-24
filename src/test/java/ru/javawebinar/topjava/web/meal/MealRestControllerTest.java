@@ -9,6 +9,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
+import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
@@ -44,10 +45,10 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(result -> new AssertionMatcher<List<Meal>>() {
+                .andExpect(result -> new AssertionMatcher<List<MealTo>>() {
                     @Override
-                    public void assertion(List<Meal> actual) throws AssertionError {
-                        MEAL_MATCHER.assertMatch(actual, meals);
+                    public void assertion(List<MealTo> actual) throws AssertionError {
+                        MEAL_TO_MATCHER.assertMatch(actual, mealTos);
                     }
                 });
     }
@@ -103,10 +104,10 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(result -> new AssertionMatcher<List<Meal>>() {
+                .andExpect(result -> new AssertionMatcher<List<MealTo>>() {
                     @Override
-                    public void assertion(List<Meal> actual) throws AssertionError {
-                        MEAL_MATCHER.assertMatch(actual, List.of(meal1));
+                    public void assertion(List<MealTo> actual) throws AssertionError {
+                        MEAL_TO_MATCHER.assertMatch(actual, mealTos);
                     }
                 });
     }
