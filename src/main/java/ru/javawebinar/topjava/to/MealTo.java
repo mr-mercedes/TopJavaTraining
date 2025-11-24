@@ -1,6 +1,7 @@
 package ru.javawebinar.topjava.to;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class MealTo {
 
@@ -40,6 +41,19 @@ public class MealTo {
 
     public boolean isExcess() {
         return excess;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        MealTo mealTo = (MealTo) object;
+        return calories == mealTo.calories && excess == mealTo.excess && Objects.equals(id, mealTo.id) && Objects.equals(dateTime, mealTo.dateTime) && Objects.equals(description, mealTo.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, dateTime, description, calories, excess);
     }
 
     @Override
