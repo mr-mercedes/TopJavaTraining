@@ -9,7 +9,7 @@ import java.util.Locale;
 
 public class CustomTimeFormatter implements Formatter<LocalTime> {
 
-    private static final String TIME_FORMAT = "HH:mm:ss";
+    private static final String TIME_FORMAT = "HH:mm";
 
     @Override
     @NonNull
