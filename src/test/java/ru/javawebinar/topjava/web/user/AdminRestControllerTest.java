@@ -11,7 +11,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -92,5 +92,30 @@ class AdminRestControllerTest extends AbstractControllerTest {
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(USER_WITH_MEALS_MATCHER.contentJson(admin));
+    }
+
+    @Test
+    void enable() throws Exception {
+        perform(MockMvcRequestBuilders.post(REST_URL + ADMIN_ID)
+                .queryParam("enable", "false")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
+                .andExpect(status().isNoContent());
+
+        ResultActions disableAction = perform(MockMvcRequestBuilders.get(REST_URL + ADMIN_ID))
+                .andExpect(status().isOk());
+
+        User disabledUser = USER_MATCHER.readFromJson(disableAction);
+        assertFalse(disabledUser.isEnabled());
+
+        perform(MockMvcRequestBuilders.post(REST_URL + ADMIN_ID)
+                .queryParam("enable", "true")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
+                .andExpect(status().isNoContent());
+
+        ResultActions enabledAction = perform(MockMvcRequestBuilders.get(REST_URL + ADMIN_ID))
+                .andExpect(status().isOk());
+
+        User enabledUser = USER_MATCHER.readFromJson(enabledAction);
+        assertTrue(enabledUser.isEnabled());
     }
 }

@@ -45,3 +45,27 @@ $(function () {
         })
     );
 });
+
+function toggleEnabled(el, id) {
+    const url = `rest/${ctx.ajaxUrl}${id}`
+    const needToOn = !Boolean(el.closest('input').attr("checked"))
+    if (needToOn) {
+        enable(url);
+    } else {
+        disable(url);
+    }
+}
+
+function enable(url) {
+    $.post({url, data: {enable: true}}).done(function () {
+        updateTable();
+        successNoty("User enable");
+    })
+}
+
+function disable(url) {
+    $.post({url, data: {enable: false}}).done(function () {
+        updateTable();
+        successNoty("User disable");
+    })
+}
