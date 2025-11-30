@@ -12,7 +12,7 @@ const ctx = {
         });
         const url = `${ctx.ajaxUrl}filter?${searchParams.toString()}`;
         $.get(url, function (data) {
-            ctx.datatableApi.clear().rows.add(data).draw();
+            updateRow(ctx.datatableApi, data)
         });
     }
 };
@@ -68,6 +68,6 @@ function cancelFilter() {
         $(this).val("");
     });
     $.get(ctx.ajaxUrl + "all", function (data) {
-        ctx.datatableApi.clear().rows.add(data).draw();
+        updateRow(ctx.datatableApi, data)
     });
 }

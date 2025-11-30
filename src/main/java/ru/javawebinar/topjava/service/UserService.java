@@ -1,6 +1,7 @@
 package ru.javawebinar.topjava.service;
 
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,9 +58,10 @@ public class UserService {
     }
 
     @Transactional
+    @CachePut(cacheNames = "users", key = "#id")
     public void updateEnable(int id, boolean enable) {
         User user = get(id);
         user.setEnabled(enable);
-        update(user);
+        repository.save(user);
     }
 }

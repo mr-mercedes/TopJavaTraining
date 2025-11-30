@@ -55,7 +55,6 @@ function toggleEnabled(cb, id) {
         type: "PATCH",
         url: url + "?enable=" + oldState
     }).done(function () {
-        ctx.updateTable();
         successNoty("User " + (oldState ? "enabled" : "disabled"));
     }).fail(function (jqXHR) {
         failNoty(jqXHR);
