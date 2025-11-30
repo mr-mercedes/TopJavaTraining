@@ -17,6 +17,12 @@ import java.util.Objects;
 @RequestMapping(value = "/meals", produces = MediaType.APPLICATION_JSON_VALUE)
 public class MealUIController extends AbstractMealController {
 
+    @Override
+    @GetMapping("/all")
+    public List<MealTo> getAll() {
+        return super.getAll();
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Integer id) {

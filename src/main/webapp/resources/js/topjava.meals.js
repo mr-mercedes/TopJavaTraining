@@ -1,10 +1,8 @@
 const mealsAjaxUrl = "meals/";
-const mealsUpdateRowAjaxUrl = "rest/profile/" + mealsAjaxUrl;
 
 // https://stackoverflow.com/a/5064235/548473
 const ctx = {
     ajaxUrl: mealsAjaxUrl,
-    updateRowAjaxUrl: mealsUpdateRowAjaxUrl,
     datatableApi: null,
     updateTable: () => {
         const searchParams = new URLSearchParams()
@@ -12,7 +10,7 @@ const ctx = {
         params.forEach(({name, value}) => {
             searchParams.set(name, value);
         });
-        const url = `${ctx.updateRowAjaxUrl}filter?${searchParams.toString()}`;
+        const url = `${ctx.ajaxUrl}filter?${searchParams.toString()}`;
         $.get(url, function (data) {
             ctx.datatableApi.clear().rows.add(data).draw();
         });
@@ -43,7 +41,7 @@ $(function () {
                 defaultContent: "Delete"
             }
         ],
-        order: [[0, "asc"]]
+        order: [[0, "desc"]]
     });
     ctx.datatableApi = table
     makeEditable(table);
@@ -69,7 +67,7 @@ function cancelFilter() {
     $("#form").find(":input").each(function () {
         $(this).val("");
     });
-    $.get(ctx.updateRowAjaxUrl, function (data) {
+    $.get(ctx.ajaxUrl + "all", function (data) {
         ctx.datatableApi.clear().rows.add(data).draw();
     });
 }

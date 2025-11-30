@@ -47,26 +47,18 @@ $(function () {
     );
 });
 
-function toggleEnabled(el, id) {
-    const url = `rest/${ctx.ajaxUrl}${id}`
-    const needToOn = !Boolean(el.closest('input').attr("checked"))
-    if (needToOn) {
-        enable(url);
-    } else {
-        disable(url);
-    }
-}
+function toggleEnabled(cb, id) {
+    const url = `${ctx.ajaxUrl}${id}`
+    const oldState = cb.checked;
 
-function enable(url) {
-    $.post({url, data: {enable: true}}).done(function () {
-        updateTable();
-        successNoty("User enable");
-    })
-}
-
-function disable(url) {
-    $.post({url, data: {enable: false}}).done(function () {
-        updateTable();
-        successNoty("User disable");
-    })
+    $.ajax({
+        type: "PATCH",
+        url: url + "?enable=" + oldState
+    }).done(function () {
+        ctx.updateTable();
+        successNoty("User " + (oldState ? "enabled" : "disabled"));
+    }).fail(function (jqXHR) {
+        failNoty(jqXHR);
+        cb.checked = !oldState;
+    });
 }
