@@ -56,6 +56,7 @@ function toggleEnabled(cb, id) {
         url: url + "?enable=" + oldState
     }).done(function () {
         successNoty("User " + (oldState ? "enabled" : "disabled"));
+        $(`#${id}`).attr('data-user-enabled', oldState);
     }).fail(function (jqXHR) {
         failNoty(jqXHR);
         cb.checked = !oldState;
