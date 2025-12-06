@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFound;
+
 public class MealsUtil {
 
     private MealsUtil() {
@@ -39,5 +41,16 @@ public class MealsUtil {
 
     public static MealTo createTo(Meal meal, boolean excess) {
         return new MealTo(meal.getId(), meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
+    }
+
+    public static Meal fromTo(MealTo mealTo) {
+        return new Meal(null, mealTo.getDateTime(), mealTo.getDescription(), mealTo.getCalories());
+    }
+
+    public static void updateFromTo(Meal meal, MealTo mealTo) {
+        checkNotFound(meal, mealTo.getId());
+        meal.setDateTime(mealTo.getDateTime());
+        meal.setDescription(mealTo.getDescription());
+        meal.setCalories(mealTo.getCalories());
     }
 }

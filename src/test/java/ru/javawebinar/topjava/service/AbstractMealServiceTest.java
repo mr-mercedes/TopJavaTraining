@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.validation.ConstraintViolationException;
@@ -73,13 +74,13 @@ public abstract class AbstractMealServiceTest extends AbstractServiceTest {
     @Test
     void update() {
         Meal updated = getUpdated();
-        service.update(updated, USER_ID);
+        service.update(MealsUtil.createTo(updated, false), USER_ID);
         MEAL_MATCHER.assertMatch(service.get(MEAL1_ID, USER_ID), getUpdated());
     }
 
     @Test
     void updateNotOwn() {
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> service.update(getUpdated(), ADMIN_ID));
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> service.update(MealsUtil.createTo(getUpdated(), false), ADMIN_ID));
         Assertions.assertEquals("Not found entity with id=" + MEAL1_ID, exception.getMessage());
         MEAL_MATCHER.assertMatch(service.get(MEAL1_ID, USER_ID), meal1);
     }
