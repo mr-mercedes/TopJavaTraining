@@ -1,7 +1,17 @@
 let form;
 
-function makeEditable(datatableApi) {
-    ctx.datatableApi = datatableApi;
+function makeEditable(datatableOpts) {
+    ctx.datatableApi = $("#datatable").DataTable(
+        {
+            ...datatableOpts,
+            "ajax": {
+                "url": ctx.ajaxUrl,
+                "dataSrc": ""
+            },
+            "paging": false,
+            "info": true
+        }
+    );
     form = $('#detailsForm');
 
     $(document).ajaxError(function (event, jqXHR, options, jsExc) {
