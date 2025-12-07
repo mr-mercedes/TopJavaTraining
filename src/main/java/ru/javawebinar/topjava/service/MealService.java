@@ -6,8 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
-import ru.javawebinar.topjava.to.MealTo;
-import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -42,10 +40,8 @@ public class MealService {
     }
 
     @Transactional
-    public void update(MealTo mealTo, int userId) {
-        Assert.notNull(mealTo, "meal must not be null");
-        Meal meal = repository.get(mealTo.getId(), userId);
-        MealsUtil.updateFromTo(meal, mealTo);
+    public void update(Meal meal, int userId) {
+        Assert.notNull(meal, "meal must not be null");
         checkNotFound(repository.save(meal, userId), meal.id());
     }
 
