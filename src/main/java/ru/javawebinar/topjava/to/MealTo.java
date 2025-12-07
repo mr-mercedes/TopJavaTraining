@@ -4,39 +4,28 @@ import java.beans.ConstructorProperties;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class MealTo extends BaseTo {
-    private LocalDateTime dateTime;
-    private String description;
-    private int calories;
+public class MealTo {
+    private final Integer id;
 
-    private boolean excess;
+    private final LocalDateTime dateTime;
+
+    private final String description;
+
+    private final int calories;
+
+    private final boolean excess;
 
     @ConstructorProperties({"id", "dateTime", "description", "calories", "excess"})
     public MealTo(Integer id, LocalDateTime dateTime, String description, int calories, boolean excess) {
-        super(id);
+        this.id = id;
         this.dateTime = dateTime;
         this.description = description;
         this.calories = calories;
         this.excess = excess;
     }
 
-    public MealTo() {
-    }
-
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setCalories(int calories) {
-        this.calories = calories;
-    }
-
-    public void setExcess(boolean excess) {
-        this.excess = excess;
+    public Integer getId() {
+        return id;
     }
 
     public LocalDateTime getDateTime() {

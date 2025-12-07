@@ -2,8 +2,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
-<c:set var="isUserPage"
-       value="${fn:contains(pageContext.request.requestURI, '/users')}" />
+<c:set var="isUserPage" value="${pageContext.request.getParameter('page') == 'users'}" />
 <spring:message code="${isUserPage ? 'user.add'  : 'meal.add'}"
                 var="addTitle" />
 <spring:message code="${isUserPage ? 'user.edit' : 'meal.edit'}"
