@@ -5,8 +5,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.to.UserTo;
@@ -14,6 +17,7 @@ import ru.javawebinar.topjava.util.UsersUtil;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -66,19 +70,20 @@ class ProfileRestControllerTest extends AbstractControllerTest {
         USER_MATCHER.assertMatch(userService.get(newId), newUser);
     }
 
-//    @Test
-//    void registerDuplicateEmail() throws Exception {
-//        UserTo duplicateEmail = new UserTo(null, "newName", "user@yandex.ru", "newPassword", 1500);
-//        MvcResult result = perform(MockMvcRequestBuilders.post(REST_URL)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(JsonUtil.writeValue(duplicateEmail)))
-//                .andDo(print())
-//                .andExpect(status().isUnprocessableEntity())
-//                .andReturn();
-//
-//        String contentAsString = result.getResponse().getContentAsString();
-//        assertThat(contentAsString).contains("User with this email already exists");
-//    }
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void registerDuplicateEmail() throws Exception {
+        UserTo duplicateEmail = new UserTo(null, "newName", "user@yandex.ru", "newPassword", 1500);
+        MvcResult result = perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(duplicateEmail)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity())
+                .andReturn();
+
+        String contentAsString = result.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("User with this email already exists");
+    }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @MethodSource("ru.javawebinar.topjava.UserTestData#invalidRegisteredUserTo")
@@ -102,19 +107,20 @@ class ProfileRestControllerTest extends AbstractControllerTest {
         USER_MATCHER.assertMatch(userService.get(USER_ID), UsersUtil.updateFromTo(new User(user), updatedTo));
     }
 
-//    @Test
-//    void updateDuplicateEmail() throws Exception {
-//        UserTo updatedTo = new UserTo(null, "newName", "user@yandex.ru", "newPassword", 1500);
-//        MvcResult result = perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
-//                .with(userHttpBasic(user))
-//                .content(JsonUtil.writeValue(updatedTo)))
-//                .andDo(print())
-//                .andExpect(status().isUnprocessableEntity())
-//                .andReturn();
-//
-//        String contentAsString = result.getResponse().getContentAsString();
-//        assertThat(contentAsString).contains("User with this email already exists");
-//    }
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void updateDuplicateEmail() throws Exception {
+        UserTo updatedTo = new UserTo(null, "newName", "guest@gmail.com", "newPassword", 1500);
+        MvcResult result = perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(updatedTo)))
+                .andDo(print())
+                .andExpect(status().isConflict())
+                .andReturn();
+
+        String contentAsString = result.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("User with this email already exists");
+    }
 
     @ParameterizedTest(name = "[{index}] {0}")
     @MethodSource("ru.javawebinar.topjava.UserTestData#invalidUpdatedUserTo")

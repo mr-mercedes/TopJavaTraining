@@ -40,7 +40,7 @@ public class ExceptionInfoHandler {
     private static final Logger log = LoggerFactory.getLogger(ExceptionInfoHandler.class);
     private static final Map<String, String> CONSTRAINS_I18N_MAP = Map.of(
             "users_unique_email_idx", "common.user.email.unique",
-            "meals_unique_user_datetime_idx", "common.meals.unique");
+            "meal_unique_user_datetime_idx", "common.meals.unique");
 
 
     //  http://stackoverflow.com/a/22358422/548473
