@@ -2,10 +2,20 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<c:url var="langEnUrl" value="${param.page}">
+    <c:param name="lang" value="en"/>
+</c:url>
+
+<c:url var="langRuUrl" value="${param.page}">
+    <c:param name="lang" value="ru"/>
+</c:url>
 
 <nav class="navbar navbar-dark bg-dark py-0">
     <div class="container">
-        <a href="meals" class="navbar-brand"><img src="resources/images/icon-meal.png"> <spring:message code="app.title"/></a>
+        <a href="meals" class="navbar-brand"><img src="resources/images/icon-meal.png"> <spring:message
+                code="app.title"/></a>
         <sec:authorize access="isAuthenticated()">
             <form:form class="form-inline my-2" action="logout" method="post">
                 <sec:authorize access="hasRole('ADMIN')">
@@ -26,5 +36,22 @@
                 </button>
             </form:form>
         </sec:authorize>
+
+        <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle"
+               href="#"
+               id="langDropdown"
+               role="button"
+               data-toggle="dropdown"
+               aria-haspopup="true"
+               aria-expanded="false">
+                ${pageContext.response.locale.language}
+            </a>
+
+            <div class="dropdown-menu" aria-labelledby="langDropdown">
+                <a class="dropdown-item" href="${langEnUrl}">English</a>
+                <a class="dropdown-item" href="${langRuUrl}">Русский</a>
+            </div>
+        </div>
     </div>
 </nav>

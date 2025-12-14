@@ -1,4 +1,4 @@
-<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="topjava" tagdir="/WEB-INF/tags" %>
@@ -7,7 +7,9 @@
 <jsp:include page="fragments/headTag.jsp"/>
 
 <body>
-<jsp:include page="fragments/bodyHeader.jsp"/>
+<jsp:include page="fragments/bodyHeader.jsp">
+    <jsp:param name="page" value="profile"/>
+</jsp:include>
 
 <div class="jumbotron pt-4">
     <div class="container">

@@ -4,6 +4,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +16,7 @@ import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 import ru.javawebinar.topjava.to.UserTo;
 import ru.javawebinar.topjava.util.UsersUtil;
+import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 
 import java.util.List;
 
@@ -91,7 +93,11 @@ public class UserService implements UserDetailsService {
     }
 
     private User prepareAndSave(User user) {
-        return repository.save(prepareToSave(user, passwordEncoder));
+        try {
+            return repository.save(prepareToSave(user, passwordEncoder));
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalRequestDataException(e.getMessage());
+        }
     }
 
     public User getWithMeals(int id) {

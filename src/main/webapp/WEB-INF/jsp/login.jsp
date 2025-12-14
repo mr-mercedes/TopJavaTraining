@@ -6,7 +6,9 @@
 <html>
 <jsp:include page="fragments/headTag.jsp"/>
 <body>
-<jsp:include page="fragments/bodyHeader.jsp"/>
+<jsp:include page="fragments/bodyHeader.jsp">
+    <jsp:param name="page" value="login"/>
+</jsp:include>
 
 <div class="jumbotron py-0">
     <div class="container">
