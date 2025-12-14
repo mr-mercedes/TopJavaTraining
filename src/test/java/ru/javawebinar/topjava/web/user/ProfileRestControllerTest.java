@@ -1,6 +1,8 @@
 package ru.javawebinar.topjava.web.user;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
@@ -64,6 +66,16 @@ class ProfileRestControllerTest extends AbstractControllerTest {
         USER_MATCHER.assertMatch(userService.get(newId), newUser);
     }
 
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("ru.javawebinar.topjava.UserTestData#invalidRegisteredUserTo")
+    void registerInvalidData(UserTo invalidUser) throws Exception {
+        perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(invalidUser)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+    }
+
     @Test
     void update() throws Exception {
         UserTo updatedTo = new UserTo(null, "newName", "user@yandex.ru", "newPassword", 1500);
@@ -74,6 +86,16 @@ class ProfileRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isNoContent());
 
         USER_MATCHER.assertMatch(userService.get(USER_ID), UsersUtil.updateFromTo(new User(user), updatedTo));
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("ru.javawebinar.topjava.UserTestData#invalidUpdatedUserTo")
+    void updateInvalidData(UserTo invalidUser) throws Exception {
+        perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(invalidUser)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test

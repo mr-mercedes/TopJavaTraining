@@ -2,6 +2,8 @@ package ru.javawebinar.topjava.web.meal;
 
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
@@ -80,6 +82,16 @@ class MealRestControllerTest extends AbstractControllerTest {
         MEAL_MATCHER.assertMatch(mealService.get(MEAL1_ID, USER_ID), updated);
     }
 
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("ru.javawebinar.topjava.MealTestData#invalidUpdatedMeals")
+    void updateInvalidData(Meal invalidMeal) throws Exception {
+        perform(MockMvcRequestBuilders.put(REST_URL + MEAL1_ID).contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(invalidMeal)))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+
     @Test
     void createWithLocation() throws Exception {
         Meal newMeal = getNew();
@@ -94,6 +106,16 @@ class MealRestControllerTest extends AbstractControllerTest {
         newMeal.setId(newId);
         MEAL_MATCHER.assertMatch(created, newMeal);
         MEAL_MATCHER.assertMatch(mealService.get(newId, USER_ID), newMeal);
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("ru.javawebinar.topjava.MealTestData#invalidCreatedMeals")
+    void createWithLocationInvalidData(Meal invalidMeal) throws Exception {
+        perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(invalidMeal)))
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
