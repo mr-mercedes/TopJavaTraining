@@ -25,6 +25,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -47,50 +48,76 @@ public class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(NotFoundException.class)
     public ErrorInfo notFoundError(HttpServletRequest req, NotFoundException e) {
-        return logAndGetErrorInfo(req, e, false, DATA_NOT_FOUND, messageSource);
+        return logAndGetErrorInfo(req, e, false, DATA_NOT_FOUND, Collections.emptyList());
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ErrorInfo conflict(HttpServletRequest req, DataIntegrityViolationException e) {
-        return logAndGetErrorInfo(req, e, true, DATA_ERROR, messageSource);
+        return logAndGetErrorInfo(req, e, true, DATA_ERROR, Collections.emptyList());
     }
 
-    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)  // 422
-    @ExceptionHandler({BindException.class, ConstraintViolationException.class, IllegalRequestDataException.class, MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
-    public ErrorInfo validationError(HttpServletRequest req, Exception e) {
-        return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR, messageSource);
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(BindException.class)
+    public ErrorInfo bind(HttpServletRequest req, BindException e) {
+        List<String> errors = e.getBindingResult().getFieldErrors().stream()
+                .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
+                .toList();
+        return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR, errors);
+    }
+
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(IllegalRequestDataException.class)
+    public ErrorInfo illegalRequest(HttpServletRequest req, IllegalRequestDataException e) {
+        List<String> errors = resolveConstraintErrors(e);
+        return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR, errors);
+    }
+
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
+    public ErrorInfo requestFormat(HttpServletRequest req, Exception e) {
+        return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR, Collections.emptyList());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public ErrorInfo internalError(HttpServletRequest req, Exception e) {
-        return logAndGetErrorInfo(req, e, true, APP_ERROR, messageSource);
+    public ErrorInfo internal(HttpServletRequest req, Exception e) {
+        return logAndGetErrorInfo(req, e, true, APP_ERROR, Collections.emptyList());
     }
 
-    //    https://stackoverflow.com/questions/538870/should-private-helper-methods-be-static-if-they-can-be-static
-    private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType, MessageSource messageSource) {
-        Throwable rootCause = ValidationUtil.getRootCause(e);
+    private ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType type, List<String> errors) {
+        Throwable root = ValidationUtil.getRootCause(e);
         if (logException) {
-            log.error(errorType + " at request " + req.getRequestURL(), rootCause);
+            log.error("{} at request {}", type, req.getRequestURL(), root);
         } else {
-            log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause.toString());
+            log.warn("{} at request {}: {}", type, req.getRequestURL(), root.toString());
         }
-        List<String> errors = new ArrayList<>();
-        if (rootCause instanceof BindException be) {
-            errors.addAll(be.getBindingResult().getFieldErrors().stream()
-                    .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
-                    .toList());
-        }
-        String message = rootCause.getMessage();
-        if (message != null) {
-            String lowerCaseMsg = message.toLowerCase();
-            for (Map.Entry<String, String> entry : CONSTRAINS_I18N_MAP.entrySet()) {
-                if (lowerCaseMsg.contains(entry.getKey())) {
-                    errors.add(messageSource.getMessage(entry.getValue(), null, LocaleContextHolder.getLocale()));
+        return new ErrorInfo(req.getRequestURL(), type, errors);
+    }
+
+    private List<String> resolveConstraintErrors(Exception e) {
+        Throwable root = ValidationUtil.getRootCause(e);
+
+        if (root instanceof ConstraintViolationException cve) {
+            String constraintName = cve.getConstraintName();
+            if (constraintName != null) {
+                String key = CONSTRAINS_I18N_MAP.get(constraintName);
+                if (key != null) {
+                    return List.of(messageSource.getMessage(key, null, LocaleContextHolder.getLocale()));
                 }
             }
         }
-        return new ErrorInfo(req.getRequestURL(), errorType, errors);
+
+        String message = root.getMessage();
+        if (message == null) return Collections.emptyList();
+
+        String lower = message.toLowerCase();
+        List<String> errors = new ArrayList<>();
+        for (var entry : CONSTRAINS_I18N_MAP.entrySet()) {
+            if (lower.contains(entry.getKey())) {
+                errors.add(messageSource.getMessage(entry.getValue(), null, LocaleContextHolder.getLocale()));
+            }
+        }
+        return errors;
     }
 }

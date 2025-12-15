@@ -3,10 +3,12 @@ package ru.javawebinar.topjava.web.user;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.to.UserTo;
 import ru.javawebinar.topjava.util.UsersUtil;
+import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 
 import java.util.List;
 
@@ -55,7 +57,12 @@ public abstract class AbstractUserController {
     public void update(UserTo userTo, int id) {
         log.info("update {} with id={}", userTo, id);
         assureIdConsistent(userTo, id);
-        service.update(userTo);
+        try {
+            service.update(userTo);
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalRequestDataException(e.getMessage());
+        }
+
     }
 
     public User getByMail(String email) {

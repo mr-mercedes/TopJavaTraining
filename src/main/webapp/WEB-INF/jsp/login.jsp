@@ -6,9 +6,7 @@
 <html>
 <jsp:include page="fragments/headTag.jsp"/>
 <body>
-<jsp:include page="fragments/bodyHeader.jsp">
-    <jsp:param name="page" value="login"/>
-</jsp:include>
+<jsp:include page="fragments/bodyHeader.jsp"/>
 
 <div class="jumbotron py-0">
     <div class="container">
@@ -20,7 +18,8 @@
         </c:if>
         <sec:authorize access="isAnonymous()">
             <div class="pt-2">
-                <a class="btn btn-lg btn-info mt-2" href="profile/register"><spring:message code="app.register"/> &raquo;</a>
+                <a class="btn btn-lg btn-info mt-2" href="profile/register"><spring:message code="app.register"/>
+                    &raquo;</a>
                 <button type="submit" class="btn btn-lg btn-primary mt-2" onclick="login('user@yandex.ru', 'password')">
                     <spring:message code="app.login"/> User
                 </button>
@@ -68,6 +67,7 @@
         setCredentials(username, password);
         $("#login_form").submit();
     }
+
     function setCredentials(username, password) {
         $('input[name="username"]').val(username);
         $('input[name="password"]').val(password);

@@ -4,13 +4,10 @@
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<c:url var="langEnUrl" value="${param.page}">
-    <c:param name="lang" value="en"/>
-</c:url>
+<c:set var="currentUrl" value="${requestScope['javax.servlet.forward.servlet_path']}"/>
+<c:url value="${currentUrl}" var="ruUrl"><c:param name="lang" value="ru"/></c:url>
+<c:url value="${currentUrl}" var="enUrl"><c:param name="lang" value="en"/></c:url>
 
-<c:url var="langRuUrl" value="${param.page}">
-    <c:param name="lang" value="ru"/>
-</c:url>
 
 <nav class="navbar navbar-dark bg-dark py-0">
     <div class="container">
@@ -49,8 +46,8 @@
             </a>
 
             <div class="dropdown-menu" aria-labelledby="langDropdown">
-                <a class="dropdown-item" href="${langEnUrl}">English</a>
-                <a class="dropdown-item" href="${langRuUrl}">Русский</a>
+                <a class="dropdown-item" href="${ruUrl}">Русский</a>
+                <a class="dropdown-item" href="${enUrl}">English</a>
             </div>
         </div>
     </div>

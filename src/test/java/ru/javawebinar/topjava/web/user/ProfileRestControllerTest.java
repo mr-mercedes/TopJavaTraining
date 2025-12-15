@@ -5,7 +5,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Propagation;
@@ -19,8 +18,7 @@ import ru.javawebinar.topjava.web.json.JsonUtil;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.javawebinar.topjava.TestUtil.userHttpBasic;
 import static ru.javawebinar.topjava.UserTestData.*;
 import static ru.javawebinar.topjava.web.user.ProfileRestController.REST_URL;
@@ -74,15 +72,15 @@ class ProfileRestControllerTest extends AbstractControllerTest {
     @Transactional(propagation = Propagation.NEVER)
     void registerDuplicateEmail() throws Exception {
         UserTo duplicateEmail = new UserTo(null, "newName", "user@yandex.ru", "newPassword", 1500);
-        MvcResult result = perform(MockMvcRequestBuilders.post(REST_URL)
+        String result = perform(MockMvcRequestBuilders.post(REST_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(duplicateEmail)))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity())
-                .andReturn();
+                .andExpect(jsonPath("$.type").value("VALIDATION_ERROR"))
+                .andReturn().getResponse().getContentAsString();
 
-        String contentAsString = result.getResponse().getContentAsString();
-        assertThat(contentAsString).contains("User with this email already exists");
+        assertThat(result).contains("Пользователь с такой почтой уже есть в приложении");
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
@@ -111,15 +109,15 @@ class ProfileRestControllerTest extends AbstractControllerTest {
     @Transactional(propagation = Propagation.NEVER)
     void updateDuplicateEmail() throws Exception {
         UserTo updatedTo = new UserTo(null, "newName", "guest@gmail.com", "newPassword", 1500);
-        MvcResult result = perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
+        String result = perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(user))
                 .content(JsonUtil.writeValue(updatedTo)))
                 .andDo(print())
-                .andExpect(status().isConflict())
-                .andReturn();
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.type").value("VALIDATION_ERROR"))
+                .andReturn().getResponse().getContentAsString();
 
-        String contentAsString = result.getResponse().getContentAsString();
-        assertThat(contentAsString).contains("User with this email already exists");
+        assertThat(result).contains("Пользователь с такой почтой уже есть в приложении");
     }
 
     @ParameterizedTest(name = "[{index}] {0}")

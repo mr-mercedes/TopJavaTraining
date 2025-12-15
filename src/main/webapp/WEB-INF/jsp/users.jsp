@@ -8,9 +8,7 @@
 <body>
 <script src="resources/js/topjava.common.js" defer></script>
 <script src="resources/js/topjava.users.js" defer></script>
-<jsp:include page="fragments/bodyHeader.jsp">
-    <jsp:param name="page" value="users"/>
-</jsp:include>
+<jsp:include page="fragments/bodyHeader.jsp"/>
 
 <div class="jumbotron pt-4">
     <div class="container">

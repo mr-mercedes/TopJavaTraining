@@ -2,14 +2,13 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="fn" uri="http://topjava.javawebinar.ru/functions" %>
-<html>
+<spring:eval expression="T(org.springframework.context.i18n.LocaleContextHolder).getLocale().language" var="lang"/>
+<html lang="${lang}">
 <jsp:include page="fragments/headTag.jsp"/>
 <body>
 <script type="text/javascript" src="resources/js/topjava.common.js" defer></script>
 <script type="text/javascript" src="resources/js/topjava.meals.js" defer></script>
-<jsp:include page="fragments/bodyHeader.jsp">
-    <jsp:param name="page" value="meals"/>
-</jsp:include>
+<jsp:include page="fragments/bodyHeader.jsp"/>
 
 <div class="jumbotron pt-4">
     <div class="container">

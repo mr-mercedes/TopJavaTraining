@@ -63,6 +63,10 @@ $(function () {
             $(row).attr("data-meal-excess", data.excess);
         }
     });
+    const lang = (document.documentElement.lang || 'ru').toLowerCase();
+    if ($.datetimepicker && $.datetimepicker.setLocale) {
+        $.datetimepicker.setLocale(lang);
+    }
 
 //  http://xdsoft.net/jqplugins/datetimepicker/
     var startDate = $('#startDate');
@@ -70,7 +74,7 @@ $(function () {
     const dateOptions = {
         timepicker: false,
         format: 'Y-m-d',
-        formatDate: 'Y-m-d',
+        formatDate: 'Y-m-d'
     };
     startDate.datetimepicker({
         ...dateOptions,

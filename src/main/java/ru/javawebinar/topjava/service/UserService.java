@@ -38,7 +38,11 @@ public class UserService implements UserDetailsService {
     @CacheEvict(value = "users", allEntries = true)
     public User create(User user) {
         Assert.notNull(user, "user must not be null");
-        return prepareAndSave(user);
+        try {
+            return prepareAndSave(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalRequestDataException(e.getMessage());
+        }
     }
 
     @CacheEvict(value = "users", allEntries = true)
@@ -64,7 +68,11 @@ public class UserService implements UserDetailsService {
     public void update(User user) {
         Assert.notNull(user, "user must not be null");
 //      checkNotFound :  check works only for JDBC, disabled
-        prepareAndSave(user);
+        try {
+            prepareAndSave(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalRequestDataException(e.getMessage());
+        }
     }
 
 
@@ -93,11 +101,7 @@ public class UserService implements UserDetailsService {
     }
 
     private User prepareAndSave(User user) {
-        try {
-            return repository.save(prepareToSave(user, passwordEncoder));
-        } catch (DataIntegrityViolationException e) {
-            throw new IllegalRequestDataException(e.getMessage());
-        }
+        return repository.save(prepareToSave(user, passwordEncoder));
     }
 
     public User getWithMeals(int id) {

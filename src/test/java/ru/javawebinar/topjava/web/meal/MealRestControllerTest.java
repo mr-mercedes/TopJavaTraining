@@ -6,8 +6,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Propagation;
@@ -23,8 +21,7 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.TestUtil.userHttpBasic;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
@@ -94,13 +91,14 @@ class MealRestControllerTest extends AbstractControllerTest {
     void updateDuplicateDate() throws Exception {
         Meal updated = getUpdated();
         updated.setDateTime(LocalDateTime.of(2020, 1, 31, 13, 0));
-        MvcResult result = perform(MockMvcRequestBuilders.put(REST_URL + MEAL1_ID).contentType(MediaType.APPLICATION_JSON)
+        String result = perform(MockMvcRequestBuilders.put(REST_URL + MEAL1_ID).contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(user))
                 .content(JsonUtil.writeValue(updated)))
                 .andExpect(status().isUnprocessableEntity())
-                .andReturn();
+                .andExpect(jsonPath("$.type").value("VALIDATION_ERROR"))
+                .andReturn().getResponse().getContentAsString();
 
-        assertThat(result.getResponse().getContentAsString()).contains("You already have meal with this date/time");
+        assertThat(result).contains("У вас уже есть еда с такой датой/времене");
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
@@ -130,25 +128,19 @@ class MealRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    @DirtiesContext
     @Transactional(propagation = Propagation.NEVER)
     void createWithLocationDuplicateDate() throws Exception {
-        Meal newMeal = getNew();
-        perform(MockMvcRequestBuilders.post(REST_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(userHttpBasic(user))
-                .content(JsonUtil.writeValue(newMeal)))
-                .andExpect(status().isCreated())
-                .andReturn();
         Meal duplicateMeal = getNew();
-        MvcResult result = perform(MockMvcRequestBuilders.post(REST_URL)
+        duplicateMeal.setDateTime(DUPLICATE_DATETIME);
+        String result = perform(MockMvcRequestBuilders.post(REST_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(user))
                 .content(JsonUtil.writeValue(duplicateMeal)))
                 .andExpect(status().isUnprocessableEntity())
-                .andReturn();
-        String contentAsString = result.getResponse().getContentAsString();
-        assertThat(contentAsString).contains("You already have meal with this date/time");
+                .andExpect(jsonPath("$.type").value("VALIDATION_ERROR"))
+                .andReturn().getResponse().getContentAsString();
+
+        assertThat(result).contains("У вас уже есть еда с такой датой/времене");
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
