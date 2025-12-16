@@ -4,7 +4,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,7 +15,6 @@ import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 import ru.javawebinar.topjava.to.UserTo;
 import ru.javawebinar.topjava.util.UsersUtil;
-import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 
 import java.util.List;
 
@@ -38,11 +36,7 @@ public class UserService implements UserDetailsService {
     @CacheEvict(value = "users", allEntries = true)
     public User create(User user) {
         Assert.notNull(user, "user must not be null");
-        try {
-            return prepareAndSave(user);
-        } catch (DataIntegrityViolationException e) {
-            throw new IllegalRequestDataException(e.getMessage());
-        }
+        return prepareAndSave(user);
     }
 
     @CacheEvict(value = "users", allEntries = true)
@@ -68,11 +62,7 @@ public class UserService implements UserDetailsService {
     public void update(User user) {
         Assert.notNull(user, "user must not be null");
 //      checkNotFound :  check works only for JDBC, disabled
-        try {
-            prepareAndSave(user);
-        } catch (DataIntegrityViolationException e) {
-            throw new IllegalRequestDataException(e.getMessage());
-        }
+        prepareAndSave(user);
     }
 
 

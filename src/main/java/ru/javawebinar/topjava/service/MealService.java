@@ -1,12 +1,10 @@
 package ru.javawebinar.topjava.service;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
-import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -51,11 +49,7 @@ public class MealService {
     }
 
     private Meal save(Meal meal, int userId) {
-        try {
-            return repository.save(meal, userId);
-        } catch (DataIntegrityViolationException e) {
-            throw new IllegalRequestDataException(e.getMessage());
-        }
+        return repository.save(meal, userId);
     }
 
     public Meal getWithUser(int id, int userId) {

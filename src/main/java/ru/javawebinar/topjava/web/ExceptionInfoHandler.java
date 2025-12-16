@@ -48,7 +48,7 @@ public class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(NotFoundException.class)
     public ErrorInfo notFoundError(HttpServletRequest req, NotFoundException e) {
-        return logAndGetErrorInfo(req, e, false, DATA_NOT_FOUND, Collections.emptyList());
+        return logAndGetErrorInfo(req, e, false, DATA_NOT_FOUND, List.of(e.getMessage()));
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)  // 409
@@ -76,13 +76,13 @@ public class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler({MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
     public ErrorInfo requestFormat(HttpServletRequest req, Exception e) {
-        return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR, Collections.emptyList());
+        return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR, List.of(e.getMessage()));
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ErrorInfo internal(HttpServletRequest req, Exception e) {
-        return logAndGetErrorInfo(req, e, true, APP_ERROR, Collections.emptyList());
+        return logAndGetErrorInfo(req, e, true, APP_ERROR, List.of(e.getMessage()));
     }
 
     private ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType type, List<String> errors) {
@@ -118,6 +118,11 @@ public class ExceptionInfoHandler {
                 errors.add(messageSource.getMessage(entry.getValue(), null, LocaleContextHolder.getLocale()));
             }
         }
+
+        if (root instanceof IllegalRequestDataException ill) {
+            errors.add(ill.getMessage());
+        }
+
         return errors;
     }
 }

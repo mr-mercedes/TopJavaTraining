@@ -3,8 +3,8 @@ package ru.javawebinar.topjava.service;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.validation.ConstraintViolationException;
@@ -50,7 +50,7 @@ public abstract class AbstractMealServiceTest extends AbstractServiceTest {
 
     @Test
     void duplicateDateTimeCreate() {
-        assertThrows(IllegalRequestDataException.class, () ->
+        assertThrows(DataIntegrityViolationException.class, () ->
                 service.create(new Meal(null, meal1.getDateTime(), "duplicate", 100), USER_ID));
     }
 
