@@ -48,7 +48,7 @@ public class MealRestController extends AbstractMealController {
         try {
             super.update(meal, id);
         } catch (DataIntegrityViolationException e) {
-            throw new IllegalRequestDataException(e.getMessage());
+            throw new IllegalRequestDataException("meal_unique_user_datetime_idx");
         }
     }
 
@@ -63,7 +63,7 @@ public class MealRestController extends AbstractMealController {
 
             return ResponseEntity.created(uriOfNewResource).body(created);
         } catch (DataIntegrityViolationException e) {
-            throw new IllegalRequestDataException(e.getMessage());
+            throw new IllegalRequestDataException("meal_unique_user_datetime_idx");
         }
     }
 

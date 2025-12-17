@@ -40,7 +40,7 @@ public class ProfileRestController extends AbstractUserController {
                     .path(REST_URL).build().toUri();
             return ResponseEntity.created(uriOfNewResource).body(created);
         } catch (DataIntegrityViolationException e) {
-            throw new IllegalRequestDataException(e.getMessage());
+            throw new IllegalRequestDataException("users_unique_email_idx");
         }
     }
 

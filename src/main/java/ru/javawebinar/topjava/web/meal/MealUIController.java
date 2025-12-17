@@ -47,9 +47,8 @@ public class MealUIController extends AbstractMealController {
                 super.update(meal, meal.getId());
             }
         } catch (DataIntegrityViolationException e) {
-            throw new IllegalRequestDataException(e.getMessage());
+            throw new IllegalRequestDataException("meal_unique_user_datetime_idx");
         }
-
     }
 
     @Override

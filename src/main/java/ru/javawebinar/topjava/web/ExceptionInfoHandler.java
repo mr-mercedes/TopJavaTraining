@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.web;
 
-import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,18 +94,8 @@ public class ExceptionInfoHandler {
         return new ErrorInfo(req.getRequestURL(), type, errors);
     }
 
-    private List<String> resolveConstraintErrors(Exception e) {
+    private List<String> resolveConstraintErrors(IllegalRequestDataException e) {
         Throwable root = ValidationUtil.getRootCause(e);
-
-        if (root instanceof ConstraintViolationException cve) {
-            String constraintName = cve.getConstraintName();
-            if (constraintName != null) {
-                String key = CONSTRAINS_I18N_MAP.get(constraintName);
-                if (key != null) {
-                    return List.of(messageSource.getMessage(key, null, LocaleContextHolder.getLocale()));
-                }
-            }
-        }
 
         String message = root.getMessage();
         if (message == null) return Collections.emptyList();
@@ -118,11 +107,9 @@ public class ExceptionInfoHandler {
                 errors.add(messageSource.getMessage(entry.getValue(), null, LocaleContextHolder.getLocale()));
             }
         }
-
         if (root instanceof IllegalRequestDataException ill) {
             errors.add(ill.getMessage());
         }
-
         return errors;
     }
 }

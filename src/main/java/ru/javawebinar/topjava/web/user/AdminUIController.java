@@ -43,7 +43,7 @@ public class AdminUIController extends AbstractUserController {
                 super.update(userTo, userTo.id());
             }
         } catch (DataIntegrityViolationException e) {
-            throw new IllegalRequestDataException(e.getMessage());
+            throw new IllegalRequestDataException("users_unique_email_idx");
         }
 
     }
