@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.support.SessionStatus;
 import ru.javawebinar.topjava.to.UserTo;
+import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.web.SecurityUtil;
 
 import javax.validation.Valid;
@@ -32,7 +33,7 @@ public class ProfileUIController extends AbstractUserController {
                 SecurityUtil.get().setTo(userTo);
                 status.setComplete();
                 return "redirect:/meals";
-            } catch (DataIntegrityViolationException e) {
+            } catch (DataIntegrityViolationException | IllegalRequestDataException e) {
                 result.rejectValue("email", "common.user.email.unique");
                 model.addAttribute("register", false);
                 return "profile";

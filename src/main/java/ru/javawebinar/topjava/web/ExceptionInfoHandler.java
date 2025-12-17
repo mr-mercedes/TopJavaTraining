@@ -107,8 +107,8 @@ public class ExceptionInfoHandler {
                 errors.add(messageSource.getMessage(entry.getValue(), null, LocaleContextHolder.getLocale()));
             }
         }
-        if (root instanceof IllegalRequestDataException ill) {
-            errors.add(ill.getMessage());
+        if (errors.isEmpty()) {
+            errors.add(lower);
         }
         return errors;
     }
